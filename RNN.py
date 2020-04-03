@@ -3,6 +3,7 @@ from keras.models import Model
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 from preprocesss import PreProcess
+import numpy as np
 
 
 class RNNClassifier(object):
@@ -15,10 +16,19 @@ class RNNClassifier(object):
 
         preprocess = PreProcess('./data/us/covid/deaths.csv')
         data = preprocess.getData()
-        death = data.iloc[:, 4:]
+        death = data.iloc[:, 5:]
         FIPS = data['countyFIPS']
+
+        X, label = [], []
+        data = death.to_numpy()
+        for i in range(0, len(data[0]) - self.time_steps):
+
+            x = data[:, i:i+self.time_steps]
+            y = data[:, i+self.time_steps]
+            X.append(x.T)
+            label.append(y)
         
-        return death, FIPS
+        return np.asarray(X), np.asarray(label)
 
     def train(self):
 

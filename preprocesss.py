@@ -3,6 +3,19 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+def findFirstNonZero(countyList):
+    length = len(countyList)
+    st = 0
+    ed = len(countyList)-1
+    while st < ed:
+        mid = (st + ed) // 2
+        if countyList[mid] == 0:
+            st = mid + 1
+        else:
+            ed = mid
+    return st
+
+
 class PreProcess(object):
     def __init__(self, path):
         self.data = pd.read_csv(path)
@@ -22,6 +35,11 @@ class PreProcess(object):
 
     def getData(self):
         return self.data
+
+    def getNdarray(self):
+        labels = self.data['countyFIPS']
+        features = self.data.values[:, 4:]
+        return features, np.array(labels)
 
     def visualization(self):
         tmp = self.data.drop(['countyFIPS'], axis=1)
@@ -43,23 +61,27 @@ class PreProcess(object):
                 # plt.draw()
                 fig1.savefig('./img/%s_4.2.png' % countyName, dpi=400)
 
-    def fitExponential(self):
+    def checkExponentialFit(self):
         countyName = 'Orleans Parish'
         countyData = self.data.loc[self.data['County Name'] == 'Orleans Parish']
         countyList = countyData.values[0][5:]
 
+        startIdx = findFirstNonZero(countyList)
+        x_data = np.array(countyList[startIdx:])
+        y_data = np.array(range(0, len(x_data)))
 
-        x_data = np.array([10, 20, 30, 40, 50])
-        y_data = np.array([1, 3, 5, 7, 9])
-
-        log_x_data = np.log(x_data)
+        log_x_data = np.log(list(x_data))
 
         curve_fit = np.polyfit(log_x_data, y_data, 1)
         print(curve_fit)
 
-        y = 4.84 * log_x_data - 10.79
-        plt.plot(log_x_data, y_data, "o")
-        plt.plot(log_x_data, y)
+        y = curve_fit[0] * log_x_data + curve_fit[1]
+        plt.plot(x_data, y_data, "o")
+        plt.plot(x_data, y)
+        plt.title(countyName)
+        plt.ylabel('date')
+        plt.xlabel('death count')
+        plt.show()
 
 
 if __name__ == '__main__':
@@ -67,4 +89,5 @@ if __name__ == '__main__':
     preprocess = PreProcess(path)
     # preprocess.process()
     # preprocess.visualization()
-    preprocess.fitExponential()
+    preprocess.checkExponentialFit()
+    # preprocess.getNdarray()
