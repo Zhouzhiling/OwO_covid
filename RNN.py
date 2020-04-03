@@ -1,5 +1,5 @@
 from keras.layers import SimpleRNN, Input, Dense
-from keras.models import Model
+from keras.models import Model, load_model
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 from preprocesss import PreProcess
@@ -10,6 +10,7 @@ class RNNClassifier(object):
 
     def __init__(self):
         self.time_steps = 10
+        self.vector_length = 10
         pass
 
     def preprocess_data(self):
@@ -28,13 +29,16 @@ class RNNClassifier(object):
             X.append(x.T)
             label.append(y)
         
-        return np.asarray(X), np.asarray(label)
+        return FIPS, np.asarray(X), np.asarray(label)
 
     def train(self):
 
-        X, y = self.preprocess_data()
+        # FIPS, X, y = self.preprocess_data()
 
-        input_data = Input(shape=(self.time_steps,))
+        X = np.random.random((100, self.time_steps, self.vector_length))
+        y = np.random.random((100, self.vector_length))
+
+        input_data = Input(shape=(self.time_steps, self.vector_length,))
 
         rnn = SimpleRNN(
             units=128,
@@ -42,7 +46,7 @@ class RNNClassifier(object):
         )(input_data)
 
         output = Dense(
-            units=1,
+            units=self.vector_length,
             activation='softmax'
         )(rnn)
 
@@ -60,7 +64,7 @@ class RNNClassifier(object):
 
         callbacks = [
             ModelCheckpoint(
-                'rnn_best.hdf5',
+                'models/RNN/rnn_best.hdf5',
                 monitor='loss',
                 verbose=1,
                 save_best_only=True,
@@ -92,14 +96,22 @@ class RNNClassifier(object):
             validation_split=0.2
         )
 
-        model.save('rnn.hdf5')
+        model.save('models/RNN/rnn.hdf5')
 
         pass
 
     def test(self):
-        pass
+
+        X = np.random.random((1, self.time_steps, self.vector_length))
+
+        model = load_model('models/RNN/rnn.hdf5')
+
+        pre = model.predict(X)
+
+        print(pre)
 
 
 if __name__ == '__main__':
     clf = RNNClassifier()
     clf.train()
+    clf.test()
