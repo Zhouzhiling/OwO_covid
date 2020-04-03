@@ -83,20 +83,25 @@ class PreProcess(object):
         plt.xlabel('death count')
         plt.show()
 
-    def getNoneZeroData(self):
+    def storeNoneZeroData(self):
         last_date = self.data.columns[-1]
         countyNoneZero = self.data.loc[self.data[last_date] != 0]
         countyZero = self.data.loc[self.data[last_date] == 0]
-        countyNoneZero.reset_index()
+        countyNoneZero.reset_index(drop=True)
         # countyZero.reset_index()
         # countyNoneZero.drop('index')
 
-        countyZero.reset_index()
+        countyZero.reset_index(drop=True)
         # countyZero.drop('index')
 
         countyNoneZero.to_csv('./processed_data/death_nonzero.csv', index=False)
         countyZero.to_csv('./processed_data/death_zero.csv', index=False)
 
+    def getNoneZeroData(self):
+        last_date = self.data.columns[-1]
+        countyNoneZero = self.data.loc[self.data[last_date] != 0]
+        countyNoneZero.reset_index(drop=True)
+        return countyNoneZero
 
 
 if __name__ == '__main__':
@@ -106,4 +111,5 @@ if __name__ == '__main__':
     # preprocess.visualization()
     # preprocess.checkExponentialFit()
     # preprocess.getNdarray()
-    preprocess.getNoneZeroData()
+    tmp = preprocess.getNoneZeroData()
+    print(tmp.head())
