@@ -10,7 +10,9 @@ deaths.csv数据分析，结果见data_analysis.md
 
 简单可视化，结果见img文件夹。
 
-K Means实现。
+全数据K Means实现（两类）
+
+Non-zero K Means实现（三类）
 
 检查death数目和指数分布的拟合情况。
 
@@ -21,4 +23,14 @@ RNN实现。
 #### **疑问**：
 
 sample_submission里面的county数量是3223个。deaths.csv中的county个数是3195(包括了Statewide Unallocated)。
+
+
+
+## TODO:
+
+add confirmed case
+
+比较函数拟合的结果和rnn的结果
+
+
 
