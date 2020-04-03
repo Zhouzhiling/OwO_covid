@@ -22,10 +22,11 @@ class RNNClassifier(object):
 
         X, label = [], []
         data = death.to_numpy()
+        self.vector_length = len(data)
         for i in range(0, len(data[0]) - self.time_steps):
 
-            x = data[:, i:i+self.time_steps]
-            y = data[:, i+self.time_steps]
+            x = data[:, i: i + self.time_steps]
+            y = data[:, i + self.time_steps]
             X.append(x.T)
             label.append(y)
         
@@ -33,10 +34,10 @@ class RNNClassifier(object):
 
     def train(self):
 
-        # FIPS, X, y = self.preprocess_data()
+        FIPS, X, y = self.preprocess_data()
 
-        X = np.random.random((100, self.time_steps, self.vector_length))
-        y = np.random.random((100, self.vector_length))
+        # X = np.random.random((100, self.time_steps, self.vector_length))
+        # y = np.random.random((100, self.vector_length))
 
         input_data = Input(shape=(self.time_steps, self.vector_length,))
 
@@ -108,7 +109,7 @@ class RNNClassifier(object):
 
         pre = model.predict(X)
 
-        print(pre)
+        print(pre, len(pre[0]))
 
 
 if __name__ == '__main__':
