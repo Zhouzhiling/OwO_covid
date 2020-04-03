@@ -29,6 +29,20 @@ git push origin master
 
 [daily_state_tests.csv](https://github.com/Zhouzhiling/OwO_covid/blob/master/data/us/covid/daily_state_tests.csv)
 
+### deaths.csv_4.2
+
+max = 499
+
+median = 0
+
+#(no death until 4.2) = 2563
+
+#(of counties) = 3195
+
+<img src="./img/cumulative death.png" alt="image-20200403141242425" style="zoom:50%;" />
+
+
+
 
 
 ### ./data/us/demographics
@@ -84,3 +98,11 @@ FIPS和county名称的对应关系
 
 
 ### ./data/us/respiratory_disease
+
+
+
+
+
+## Questions
+
+sample_submission里面的county数量是3223个。deaths.csv中的county个数是3195(包括了Statewide Unallocated)。
