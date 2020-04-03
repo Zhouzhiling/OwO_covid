@@ -27,7 +27,7 @@ class PreProcess(object):
             if item[0] == 0:
                 indexes.append(idx)
         self.data = self.data.drop(indexes, axis=0)
-        self.data = self.data.reset_index()
+        self.data = self.data.reset_index(drop=True)
         # self.data.reset_index()
 
     def process(self):
@@ -83,11 +83,27 @@ class PreProcess(object):
         plt.xlabel('death count')
         plt.show()
 
+    def getNoneZeroData(self):
+        last_date = self.data.columns[-1]
+        countyNoneZero = self.data.loc[self.data[last_date] != 0]
+        countyZero = self.data.loc[self.data[last_date] == 0]
+        countyNoneZero.reset_index()
+        # countyZero.reset_index()
+        # countyNoneZero.drop('index')
+
+        countyZero.reset_index()
+        # countyZero.drop('index')
+
+        countyNoneZero.to_csv('./processed_data/death_nonzero.csv', index=False)
+        countyZero.to_csv('./processed_data/death_zero.csv', index=False)
+
+
 
 if __name__ == '__main__':
     path = './data/us/covid/deaths.csv'
     preprocess = PreProcess(path)
     # preprocess.process()
     # preprocess.visualization()
-    preprocess.checkExponentialFit()
+    # preprocess.checkExponentialFit()
     # preprocess.getNdarray()
+    preprocess.getNoneZeroData()
