@@ -1,5 +1,4 @@
 from sklearn.cluster import KMeans
-import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from preprocesss import PreProcess
@@ -10,7 +9,8 @@ class KMeansClassifier(object):
     def __init__(self, clusters_cnt):
         self.kmeans = KMeans(clusters_cnt)
 
-    def load_data(self):
+    @staticmethod
+    def load_data():
         preprocess = PreProcess('./data/us/covid/deaths.csv')
         data = preprocess.getData()
         death = data.iloc[:, 4:].diff(axis=1).iloc[:, 1:]
