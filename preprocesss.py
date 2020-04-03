@@ -12,7 +12,8 @@ class PreProcess(object):
         for idx, item in enumerate(self.data.values):
             if item[0] == 0:
                 indexes.append(idx)
-        self.data = self.data.drop(indexes, axis=0).reset_index()
+        self.data = self.data.drop(indexes, axis=0)
+        self.data = self.data.reset_index()
         # self.data.reset_index()
 
     def process(self):
@@ -41,7 +42,15 @@ class PreProcess(object):
                 # plt.draw()
                 fig1.savefig('./img/%s_4.2.png' % countyName, dpi=400)
 
-    # def fitExponential(self):
+    def fitExponential(self, input):
+        x_data = np.array([10, 20, 30, 40, 50])
+        y_data = np.array([1, 3, 5, 7, 9])
+
+        log_x_data = np.log(x_data)
+        log_y_data = np.log(y_data)
+
+        curve_fit = np.polyfit(log_x_data, y_data, 1)
+        print(curve_fit)
 
 
 
