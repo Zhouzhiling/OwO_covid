@@ -1,26 +1,34 @@
 from sklearn.cluster import KMeans
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+from preprocesss import PreProcess
 
 
 class KMeansClassifier(object):
 
     def __init__(self, clusters_cnt):
-        self.clusters_cnt = clusters_cnt
-        self.kmeans = KMeans()
-        pass
+        self.kmeans = KMeans(clusters_cnt)
 
     def load_data(self):
-        X = np.array([[1, 2], [1, 4], [1, 0], [10, 2], [10, 4], [10, 0]])
-        return X
+        preprocess = PreProcess('./data/us/covid/deaths.csv')
+        data = preprocess.getData()
+        death = data.iloc[:, 4:].diff(axis=1).iloc[:, 1:]
+        FIPS = data['countyFIPS']
+
+        # normalization
+        min_max_scale = MinMaxScaler()
+        death = min_max_scale.fit_transform(death.to_numpy().T).T
+
+        return FIPS, death
 
     def train(self):
-        X = self.load_data()
-        self.kmeans.fit(X)
+        FIPS, death = self.load_data()
+        self.kmeans.fit(death)
 
         labels = pd.Series(data=self.kmeans.labels_, name='cluster')
-        labels.to_csv('processed_data/kmeans_label.csv')
-        pass
+        county_clusters = pd.concat([FIPS, labels], axis=1)
+        county_clusters.to_csv(path_or_buf='processed_data/kmeans_label.csv', index=False)
 
     def test(self):
         pass
@@ -28,3 +36,4 @@ class KMeansClassifier(object):
 
 if __name__ == '__main__':
     clf = KMeansClassifier(2)
+    clf.train()
