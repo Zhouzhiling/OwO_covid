@@ -100,7 +100,7 @@ class PreProcess(object):
     def getNoneZeroData(self):
         last_date = self.data.columns[-1]
         countyNoneZero = self.data.loc[self.data[last_date] != 0]
-        countyNoneZero.reset_index(drop=True)
+        countyNoneZero = countyNoneZero.reset_index(drop=True)
         return countyNoneZero
 
 
