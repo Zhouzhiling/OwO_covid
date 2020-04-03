@@ -29,15 +29,17 @@ git push origin master
 
 [daily_state_tests.csv](https://github.com/Zhouzhiling/OwO_covid/blob/master/data/us/covid/daily_state_tests.csv)
 
+
+
 ### deaths.csv_4.2
 
-max = 499
+是累加数据还是当日数据？
 
-median = 0
-
-#(no death until 4.2) = 2563
-
-#(of counties) = 3195
+> max = 499
+>
+> 截止4.2，无死亡人数的county数目是2563，county总数是3195
+>
+> 已出现死亡的county大多符合指数分布
 
 <img src="./img/cumulative death.png" alt="image-20200403141242425" style="zoom:50%;" />
 
