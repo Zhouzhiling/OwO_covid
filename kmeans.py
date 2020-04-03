@@ -7,13 +7,17 @@ from preprocesss import PreProcess
 class KMeansClassifier(object):
 
     def __init__(self, clusters_cnt):
-        self.kmeans = KMeans(clusters_cnt)
+        self.kmeans = KMeans(
+            n_clusters=clusters_cnt,
+            init='random',
+            verbose=1
+        )
 
     @staticmethod
     def load_data():
         preprocess = PreProcess('./data/us/covid/deaths.csv')
         data = preprocess.getData()
-        death = data.iloc[:, 4:].diff(axis=1).iloc[:, 1:]
+        death = data.iloc[:, 5:].diff(axis=1).iloc[:, 1:]
         FIPS = data['countyFIPS']
 
         # normalization
