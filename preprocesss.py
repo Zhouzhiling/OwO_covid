@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 class PreProcess(object):
     def __init__(self, path):
         self.data = pd.read_csv(path)
+        self.process()
 
     def removeStatewideUnallocated(self):
         indexes = []
@@ -42,21 +43,28 @@ class PreProcess(object):
                 # plt.draw()
                 fig1.savefig('./img/%s_4.2.png' % countyName, dpi=400)
 
-    def fitExponential(self, input):
+    def fitExponential(self):
+        countyName = 'Orleans Parish'
+        countyData = self.data.loc[self.data['County Name'] == 'Orleans Parish']
+        countyList = countyData.values[0][5:]
+
+
         x_data = np.array([10, 20, 30, 40, 50])
         y_data = np.array([1, 3, 5, 7, 9])
 
         log_x_data = np.log(x_data)
-        log_y_data = np.log(y_data)
 
         curve_fit = np.polyfit(log_x_data, y_data, 1)
         print(curve_fit)
 
+        y = 4.84 * log_x_data - 10.79
+        plt.plot(log_x_data, y_data, "o")
+        plt.plot(log_x_data, y)
 
 
 if __name__ == '__main__':
     path = './data/us/covid/deaths.csv'
     preprocess = PreProcess(path)
-    preprocess.process()
-    preprocess.visualization()
-
+    # preprocess.process()
+    # preprocess.visualization()
+    preprocess.fitExponential()
