@@ -32,5 +32,24 @@ add confirmed case
 
 比较函数拟合的结果和rnn的结果
 
+# 4.4
 
+不同county在4.3当天的死亡率方差较大。
+
+同一个county在时间线上的死亡率方差也较大。
+
+```
+# of death / # of confirmed:
+std of county of > 50 death is 0.014409632565737372
+mean of county of > 50 death is 0.029978383880098266
+
+std of all county is 0.1377636853574628
+mean of all county is 0.08411215325002097
+```
+
+
+
+## TODO
+
+加入医疗，医疗数目，county贫困程度等数据，输入RNN。
 
