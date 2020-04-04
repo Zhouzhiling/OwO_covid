@@ -101,10 +101,3 @@ FIPS和county名称的对应关系
 
 ### ./data/us/respiratory_disease
 
-
-
-
-
-## Questions
-
-sample_submission里面的county数量是3223个。deaths.csv中的county个数是3195(包括了Statewide Unallocated)。

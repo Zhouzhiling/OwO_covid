@@ -4,7 +4,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 def findFirstNonZero(countyList):
-    length = len(countyList)
     st = 0
     ed = len(countyList)-1
     while st < ed:
@@ -18,44 +17,64 @@ def findFirstNonZero(countyList):
 
 class PreProcess(object):
     def __init__(self, path):
-        self.data = pd.read_csv(path)
+        self.deathData = pd.read_csv(path + 'deaths.csv')
+        self.confirmedData = pd.read_csv(path + 'confirmed_cases.csv')
         self.process()
 
     def removeStatewideUnallocated(self):
         indexes = []
-        for idx, item in enumerate(self.data.values):
+        for idx, item in enumerate(self.deathData.values):
             if item[0] == 0:
                 indexes.append(idx)
-        self.data = self.data.drop(indexes, axis=0)
-        self.data = self.data.reset_index(drop=True)
-        # self.data.reset_index()
+        self.deathData = self.deathData.drop(indexes, axis=0)
+        self.deathData = self.deathData.reset_index(drop=True)
+
+        indexes = []
+        for idx, item in enumerate(self.confirmedData.values):
+            if item[0] == 0:
+                indexes.append(idx)
+        self.confirmedData = self.confirmedData.drop(indexes, axis=0)
+        self.confirmedData = self.confirmedData.reset_index(drop=True)
 
     def process(self):
         self.removeStatewideUnallocated()
 
     def getData(self):
-        return self.data
+        return self.deathData
+
+    def getConfirmedData(self):
+        return self.confirmedData
 
     def getNdarray(self):
-        labels = self.data['countyFIPS']
-        features = self.data.values[:, 4:]
+        labels = self.deathData['countyFIPS']
+        features = self.deathData.values[:, 4:]
+        return features, np.array(labels)
+
+    def getConfirmedDataNdarray(self):
+        labels = self.confirmedData['countyFIPS']
+        features = self.confirmedData.values[:, 4:]
         return features, np.array(labels)
 
     def visualization(self):
-        tmp = self.data.drop(['countyFIPS'], axis=1)
-        tmp = tmp.drop(['stateFIPS'], axis=1)  # County Name
-        count_zero = 0
-        cumulative_death = tmp['4/2/20']
-        plt.hist(cumulative_death)
-        plt.title('cumulative # of deaths until 4.2')
+        death = self.deathData.drop(['countyFIPS'], axis=1)
+        death = death.drop(['stateFIPS'], axis=1)  # County Name
+        cumulative_death = death['4/3/20']
+        # plt.hist(cumulative_death)
+        # plt.title('cumulative # of deaths until 4.2')
 
-        plt.show()
-        for item in tmp.values:
-            countyName = item[0]
-            deaths = item[2:]
+        confirmed = self.confirmedData.drop(['countyFIPS'], axis=1)
+        confirmed = confirmed.drop(['stateFIPS'], axis=1)  # County Name
+        cumulative_confirmed = confirmed['4/3/20']
+
+        for d, c in zip(death.values, confirmed.values):
+            countyName = d[0]
+            deaths = d[2:]
+            confirmeds = c[2:]
+            X = range(0, len(deaths))
             if deaths[-1] >= 50:
                 fig1 = plt.gcf()
-                plt.scatter(range(0, len(deaths)), deaths)
+                plt.plot(X, deaths, X, confirmeds)
+                plt.legend(['death', 'confirmed'])
                 plt.title(countyName)
                 plt.show()
                 # plt.draw()
@@ -63,7 +82,7 @@ class PreProcess(object):
 
     def checkExponentialFit(self):
         countyName = 'Orleans Parish'
-        countyData = self.data.loc[self.data['County Name'] == 'Orleans Parish']
+        countyData = self.deathData.loc[self.deathData['County Name'] == 'Orleans Parish']
         countyList = countyData.values[0][5:]
 
         startIdx = findFirstNonZero(countyList)
@@ -84,9 +103,9 @@ class PreProcess(object):
         plt.show()
 
     def storeNoneZeroData(self):
-        last_date = self.data.columns[-1]
-        countyNoneZero = self.data.loc[self.data[last_date] != 0]
-        countyZero = self.data.loc[self.data[last_date] == 0]
+        last_date = self.deathData.columns[-1]
+        countyNoneZero = self.deathData.loc[self.deathData[last_date] != 0]
+        countyZero = self.deathData.loc[self.deathData[last_date] == 0]
         countyNoneZero.reset_index(drop=True)
         # countyZero.reset_index()
         # countyNoneZero.drop('index')
@@ -98,18 +117,18 @@ class PreProcess(object):
         countyZero.to_csv('./processed_data/death_zero.csv', index=False)
 
     def getNoneZeroData(self):
-        last_date = self.data.columns[-1]
-        countyNoneZero = self.data.loc[self.data[last_date] != 0]
+        last_date = self.deathData.columns[-1]
+        countyNoneZero = self.deathData.loc[self.deathData[last_date] != 0]
         countyNoneZero = countyNoneZero.reset_index(drop=True)
         return countyNoneZero
 
 
 if __name__ == '__main__':
-    path = './data/us/covid/deaths.csv'
+    path = './data/us/covid/'
     preprocess = PreProcess(path)
     # preprocess.process()
-    # preprocess.visualization()
+    preprocess.visualization()
     # preprocess.checkExponentialFit()
     # preprocess.getNdarray()
-    tmp = preprocess.getNoneZeroData()
-    print(tmp.head())
+    # tmp = preprocess.getConfirmedDataNdarray()
+    # print(tmp.head())

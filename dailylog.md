@@ -1,10 +1,10 @@
-## 4.2
+# 4.2
 
 数据初步分析，初版模型框架为K Means + RNN
 
 
 
-## 4.3
+# 4.3
 
 deaths.csv数据分析，结果见data_analysis.md
 
