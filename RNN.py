@@ -47,8 +47,7 @@ class RNNClassifier(object):
         )(input_data)
 
         output = Dense(
-            units=self.vector_length,
-            activation='softmax'
+            units=self.vector_length
         )(rnn)
 
         model = Model(input_data, output)
@@ -103,7 +102,9 @@ class RNNClassifier(object):
 
     def test(self):
 
-        X = np.random.random((1, self.time_steps, self.vector_length))
+        FIPS, x, y = self.preprocess_data()
+
+        X = np.reshape(x[-1], (1, self.time_steps, self.vector_length))
 
         model = load_model('models/RNN/rnn.hdf5')
 
@@ -114,5 +115,5 @@ class RNNClassifier(object):
 
 if __name__ == '__main__':
     clf = RNNClassifier()
-    clf.train()
+    # clf.train()
     clf.test()
