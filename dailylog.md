@@ -53,3 +53,5 @@ mean of all county is 0.08411215325002097
 
 加入医疗，医疗数目，county贫困程度等数据，输入RNN。
 
+SIR
+
