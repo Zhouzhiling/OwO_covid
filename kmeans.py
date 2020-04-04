@@ -16,8 +16,8 @@ class KMeansClassifier(object):
     @staticmethod
     def load_data():
         preprocess = PreProcess('./data/us/covid/deaths.csv')
-        data = preprocess.getNoneZeroData()
-        death = data.iloc[:, 5:].diff(axis=1).iloc[:, 1:]
+        data = preprocess.getData()
+        death = data.iloc[:, 5:]
         FIPS = data['countyFIPS']
 
         # normalization
@@ -39,5 +39,5 @@ class KMeansClassifier(object):
 
 
 if __name__ == '__main__':
-    clf = KMeansClassifier(3)
+    clf = KMeansClassifier(2)
     clf.train()
