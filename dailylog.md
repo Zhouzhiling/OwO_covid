@@ -55,3 +55,17 @@ mean of all county is 0.08411215325002097
 
 SIR
 
+# 4.5
+
+SIR模型跑通了！
+
+
+
+## TODO
+
+查资料，[parameters](https://github.com/ryansmcgee/seirsplus)估计
+
+之后可以考虑用机器学习预测参数
+
+
+
