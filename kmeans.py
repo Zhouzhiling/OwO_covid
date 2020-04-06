@@ -15,7 +15,7 @@ class KMeansClassifier(object):
 
     @staticmethod
     def load_data():
-        preprocess = PreProcess('./data/us/covid/deaths.csv')
+        preprocess = PreProcess('./data/us/covid/')
         data = preprocess.getData()
         death = data.iloc[:, 5:]
         FIPS = data['countyFIPS']
@@ -32,7 +32,7 @@ class KMeansClassifier(object):
 
         labels = pd.Series(data=self.kmeans.labels_, name='cluster')
         county_clusters = pd.concat([FIPS, labels], axis=1)
-        county_clusters.to_csv(path_or_buf='processed_data/kmeans_label.csv', index=False)
+        county_clusters.to_csv(path_or_buf='processed_data/kmeans/kmeans_label.csv', index=False)
 
     def test(self):
         pass
