@@ -75,6 +75,8 @@ county之间的地理位置信息，county的中心点等。
 
 医院数目，床位数量，icu床位数
 
+Beds per mile is the number of hospital beds per 1000 people in a county.
+
 
 
 ### ./data/us/mobility
