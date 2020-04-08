@@ -1,7 +1,6 @@
 from seirsplus.models import *
 from preprocesss import PreProcess
 import pandas as pd
-from collections import Counter
 
 
 class SEIRSModelClass(object):
@@ -70,8 +69,19 @@ class SEIRSModelClass(object):
 
             self.models.append(model)
 
+    def getDeath(self):
+        # output = pd.DataFrame()
+        death_count = []
+        for i in range(len(self.models)):
+            death_count.append(self.models[i].numF[-14:])
+        death_count = pd.DataFrame(death_count)
+        county_info = self.initial_parameters['countyFIPS']
+        output = pd.concat([county_info, death_count], axis=1)
+        output.to_csv('./processed_data/SEIRS_predictions.csv')
+
+
     def visualization(self):
-        self.model.figure_infections(vlines=self.checkpoints['t'], plot_F='line', ylim=0.2)
+        self.models[0].figure_infections(vlines=self.checkpoints['t'], plot_F='line', ylim=0.2)
 
 
 if __name__ == '__main__':
@@ -79,3 +89,4 @@ if __name__ == '__main__':
     seirsModel.preprocess()
     seirsModel.train()
     # seirsModel.visualization()
+    seirsModel.getDeath()
