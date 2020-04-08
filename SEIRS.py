@@ -57,7 +57,7 @@ class SEIRSModelClass(object):
                 theta_I=self.initial_parameters['theta_I'][i],          # rate of testing for infectious individuals
                 psi_E=self.initial_parameters['psi_E'][i],          # rate of positive test results for exposed individuals
                 psi_I=self.initial_parameters['psi_I'][i],          # rate of positive test results for infectious individuals
-                initI=10000,
+                initI=1,
                 initE=0,
                 initD_E=0,
                 initD_I=0,
@@ -73,12 +73,11 @@ class SEIRSModelClass(object):
         # output = pd.DataFrame()
         death_count = []
         for i in range(len(self.models)):
-            death_count.append(self.models[i].numF[-14:])
+            death_count.append([round(death) for death in self.models[i].numF[-14:]])
         death_count = pd.DataFrame(death_count)
         county_info = self.initial_parameters['countyFIPS']
         output = pd.concat([county_info, death_count], axis=1)
-        output.to_csv('./processed_data/SEIRS_predictions.csv')
-
+        output.to_csv('./processed_data/SEIRS_predictions.csv', index=False)
 
     def visualization(self):
         self.models[0].figure_infections(vlines=self.checkpoints['t'], plot_F='line', ylim=0.2)
