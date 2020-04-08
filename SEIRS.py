@@ -1,4 +1,5 @@
 from seirsplus.models import *
+from preprocesss import PreProcess
 
 
 class SEIRSModelClass(object):
@@ -13,7 +14,10 @@ class SEIRSModelClass(object):
         }
 
     def preprocess(self):
-        pass
+        preprocess = PreProcess('./data/us/covid/')
+        countyInfo = preprocess.deathData[['countyFIPS', 'County Name', 'State', 'stateFIPS']]
+        print(countyInfo['countyFIPS'])
+
 
     def train(self):
         # self.model = SEIRSModel(beta=0.155, sigma=1/5.2, gamma=1/12.39, initN=100000, initI=100)
@@ -51,6 +55,6 @@ class SEIRSModelClass(object):
 
 if __name__ == '__main__':
     seirsModel = SEIRSModelClass()
-    # seirsModel.preprocess()
+    seirsModel.preprocess()
     seirsModel.train()
     seirsModel.visualization()
