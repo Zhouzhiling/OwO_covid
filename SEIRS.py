@@ -14,12 +14,15 @@ class SEIRSModelClass(object):
             'theta_I': [0.02, 0.02]
         }
         self.initial_parameters = []
+        self.initial_death = []
         self.period = 300
 
     def preprocess(self):
+        last_day = '4/6/2020'
         preprocess = PreProcess('./data/us/covid/')
-        countyInfo = preprocess.deathData[['countyFIPS', 'County Name', 'State', 'stateFIPS']]
+        countyInfo = preprocess.deathData[['countyFIPS', 'County Name', 'State', 'stateFIPS', last_day]]
         county_population = pd.read_csv('data/us/demographics/county_populations.csv')
+        countyInfo = countyInfo.rename(columns={last_day: "death_%s" % last_day})
 
         county_initial_parameters = county_population.merge(countyInfo, left_on='FIPS', right_on='countyFIPS')
         county_numbers = len(county_initial_parameters)
@@ -33,8 +36,9 @@ class SEIRSModelClass(object):
         theta_I = pd.Series([0 for _ in range(county_numbers)], name='theta_I')
         psi_E = pd.Series([0 for _ in range(county_numbers)], name='psi_E')
         psi_I = pd.Series([0 for _ in range(county_numbers)], name='psi_I')
+        initF = pd.Series(countyInfo["death_%s" % last_day], name='initF')
 
-        self.initial_parameters = pd.concat([county_initial_parameters, beta, sigma, gamma, mu_I, xi, sigma_D, theta_E, theta_I, psi_E, psi_I], axis=1)
+        self.initial_parameters = pd.concat([county_initial_parameters, beta, sigma, gamma, mu_I, xi, sigma_D, theta_E, theta_I, psi_E, psi_I, initF], axis=1)
         self.initial_parameters.to_csv('processed_data/county_initial_parameters.csv', index=False)
 
     def train(self):
@@ -58,11 +62,11 @@ class SEIRSModelClass(object):
                 psi_E=self.initial_parameters['psi_E'][i],          # rate of positive test results for exposed individuals
                 psi_I=self.initial_parameters['psi_I'][i],          # rate of positive test results for infectious individuals
                 initI=1,
-                initE=0,
+                initE=0,        # initI * 0.15
                 initD_E=0,
                 initD_I=0,
-                initR=0,
-                initF=0
+                initR=self.initial_parameters['initF'][i] * 2,        # initF * 2
+                initF=self.initial_parameters['initF'][i]
             )
 
             model.run(T=self.period, checkpoints=self.checkpoints)
@@ -88,4 +92,4 @@ if __name__ == '__main__':
     seirsModel.preprocess()
     seirsModel.train()
     # seirsModel.visualization()
-    seirsModel.getDeath()
+    # seirsModel.getDeath()
