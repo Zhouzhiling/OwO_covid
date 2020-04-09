@@ -4,6 +4,7 @@ import pandas as pd
 
 
 class SEIRSModelClass(object):
+
     def __init__(self):
         self.models = []
         self.data = None
@@ -14,7 +15,6 @@ class SEIRSModelClass(object):
             'theta_I': [0.02, 0.02]
         }
         self.initial_parameters = []
-        self.initial_death = []
         self.period = 300
 
     def preprocess(self):
