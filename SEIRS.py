@@ -18,7 +18,10 @@ class SEIRSModelClass(object):
         self.period = 300
 
     def preprocess(self):
+
         last_day = '4/6/2020'
+
+        # initiate parameters
         preprocess = PreProcess('./data/us/covid/')
         countyInfo = preprocess.deathData[['countyFIPS', 'County Name', 'State', 'stateFIPS', last_day]]
         county_population = pd.read_csv('data/us/demographics/county_populations.csv')
@@ -41,8 +44,20 @@ class SEIRSModelClass(object):
         self.initial_parameters = pd.concat([county_initial_parameters, beta, sigma, gamma, mu_I, xi, sigma_D, theta_E, theta_I, psi_E, psi_I, initF], axis=1)
         self.initial_parameters.to_csv('processed_data/county_initial_parameters.csv', index=False)
 
+        # initiate infectious population
+        county_confirmed_cases = pd.read_csv('data/us/covid/confirmed_cases.csv')
+        county_initial_confirmed_case = pd.Series([0 for _ in range(county_numbers)], name='init_infected')
+
+        self.initial_parameters = pd.concat([self.initial_parameters, county_initial_confirmed_case], axis=1)
+
+        for i in range(county_numbers):
+            self.initial_parameters['init_infected'][i] = county_confirmed_cases.loc[county_confirmed_cases['countyFIPS'] == self.initial_parameters['countyFIPS'][i]]['4/6/20']
+
     def train(self):
         for i in range(len(self.initial_parameters)):
+
+            infected = round(self.initial_parameters['init_infected'][i] / 0.85)
+            exposed = round(infected * 0.15)
 
             model = SEIRSModel(
                 initN=self.initial_parameters['total_pop'][i],
@@ -61,11 +76,11 @@ class SEIRSModelClass(object):
                 theta_I=self.initial_parameters['theta_I'][i],          # rate of testing for infectious individuals
                 psi_E=self.initial_parameters['psi_E'][i],          # rate of positive test results for exposed individuals
                 psi_I=self.initial_parameters['psi_I'][i],          # rate of positive test results for infectious individuals
-                initI=1,
-                initE=0,        # initI * 0.15
-                initD_E=0,
-                initD_I=0,
-                initR=self.initial_parameters['initF'][i] * 2,        # initF * 2
+                initI=infected,
+                initE=exposed,
+                initD_E=round(self.initial_parameters['init_infected'][i] * 0.15),
+                initD_I=round(self.initial_parameters['init_infected'][i] * 0.85),
+                initR=self.initial_parameters['initF'][i] * 2,  # initF * 2
                 initF=self.initial_parameters['initF'][i]
             )
 
