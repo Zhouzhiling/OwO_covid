@@ -96,7 +96,7 @@ class Output(object):
 
     def save_submission(self):
         self.modify_submission()
-        self.sample.to_csv('submission.csv')
+        self.sample.to_csv('submission.csv', index=False)
 
 
 if __name__ == '__main__':
