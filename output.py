@@ -33,19 +33,7 @@ class Output(object):
                 key = self.generate_key(cur_date, FIPS)
                 value = average
                 key_value[key] = value
-                # for i, v in enumerate(value):
-                # index = self.sample['id'] == key
-                # self.sample.loc[][str((i+1)*10)] = v
-                # print(key)
-                # print(self.sample.loc[self.sample['id'] == key][str((i+1)*10)])
 
-        # for i in range(len(self.sample.values)):
-        #     key = self.sample.values[i][0]
-        #     if key not in key_value:
-        #         continue
-        #     percentiles = key_value[key]
-        #     for j in range(len(percentiles)):
-        #         self.sample.iloc[i, j] = percentiles[j]
         pre = np.zeros((len(self.sample), 9))
         for i in range(len(self.sample)):
             if i % 1000 == 0:
@@ -56,12 +44,6 @@ class Output(object):
                 continue
             percentiles = self.generate_percentile(key_value[key])
             pre[i][:] = percentiles
-            # for j in range(len(percentiles)):
-            # self.sample.iloc[i, 1:10] = percentiles
-
-        percentile_keys = ['10', '20', '30', '40', '50', '60', '70', '80', '90']
-        for col in range(9):
-            self.sample[percentile_keys[col]] = pre[:, col]
 
         # ground truth part
         ground_truth = pd.read_csv('data/us/covid/deaths.csv')
@@ -72,9 +54,14 @@ class Output(object):
             if len(ground_truth.loc[ground_truth['countyFIPS'] == int(FIPS)][date].values) == 0:
                 continue
             average = ground_truth.loc[ground_truth['countyFIPS'] == int(FIPS)][date].values[0]
-            percentile = self.generate_percentile(average)
-            for j in range(9):
-                self.sample.iloc[i, j + 1] = percentile[j]
+            percentiles = self.generate_percentile(average)
+            pre[i][:] = percentiles
+            # for j in range(9):
+            #     self.sample.iloc[i, j + 1] = percentile[j]
+
+        percentile_keys = ['10', '20', '30', '40', '50', '60', '70', '80', '90']
+        for col in range(9):
+            self.sample[percentile_keys[col]] = pre[:, col]
 
     @staticmethod
     def generate_percentile(mid):
@@ -87,7 +74,7 @@ class Output(object):
     @staticmethod
     def format_key(key):
         strs = key.split('-')
-        year = strs[0]
+        year = strs[0][-2:]
         month = strs[1][1]
         if strs[2][0] == '0':
             day = strs[2][1]
