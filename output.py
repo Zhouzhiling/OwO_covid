@@ -5,13 +5,26 @@ class Output(object):
 
     def __init__(self):
         self.sample = self.read_sample()
+        self.last_day = '4/6/2020'
 
     @staticmethod
     def read_sample():
         return pd.read_csv('sample_submission.csv')
 
     def modify_submission(self):
-        pass
+        # predicted part
+        predicted = pd.read_csv('processed_data/SEIRS_predictions.csv')
+        for deaths in predicted.values:
+            FIPS, deaths = deaths[0], deaths[1:]
+        
+    def generate_percentile(self, mid):
+        length = 9
+        output = []
+        unit = mid / 5.0
+        for i in range(9):
+            output.append(unit * (i+1))
+        return output
+
 
     def format_key(self, key):
         strs = key.split('-')
@@ -35,4 +48,6 @@ class Output(object):
 
 if __name__ == '__main__':
     output = Output()
-    output.save_submission()
+    # output.save_submission()
+    output.modify_submission()
+    # print(output.generate_percentile(5))
