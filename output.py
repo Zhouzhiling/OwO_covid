@@ -24,12 +24,12 @@ class Output(object):
 
         for infos in predicted.values:
             FIPS, deaths = infos[0], infos[1:]
-            for day_idx, death in enumerate(deaths):
+            for day_idx, average in enumerate(deaths):
                 if day_idx == 0:
                     continue
                 cur_date = date_time + datetime.timedelta(days=day_idx)
                 key = self.generate_key(cur_date, FIPS)
-                value = self.generate_percentile(death)
+                value = average
                 key_value[key] = value
                 # for i, v in enumerate(value):
                 # index = self.sample['id'] == key
@@ -37,13 +37,24 @@ class Output(object):
                 # print(key)
                 # print(self.sample.loc[self.sample['id'] == key][str((i+1)*10)])
 
-        for i in range(len(self.sample.values)):
-            key = self.sample.values[i][0]
+        # for i in range(len(self.sample.values)):
+        #     key = self.sample.values[i][0]
+        #     if key not in key_value:
+        #         continue
+        #     percentiles = key_value[key]
+        #     for j in range(len(percentiles)):
+        #         self.sample.iloc[i, j] = percentiles[j]
+        print(1)
+        for i in range(len(self.sample)):
+            if i % 1000 == 0:
+                print("%d/%d" % (i, len(self.sample)))
+
+            key = self.sample['id'][i]
             if key not in key_value:
                 continue
-            percentiles = key_value[key]
-            for j in range(len(percentiles)):
-                self.sample.iloc[i, j] = percentiles[j]
+            percentiles = self.generate_percentile(key_value[key])
+            # for j in range(len(percentiles)):
+            self.sample.iloc[i, 1:10] = percentiles
 
         # ground truth part
         ground_truth = pd.read_csv('data/us/covid/deaths.csv')
@@ -91,5 +102,4 @@ class Output(object):
 if __name__ == '__main__':
     output = Output()
     output.save_submission()
-    output.modify_submission()
     # print(output.generate_percentile(5))
