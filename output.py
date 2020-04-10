@@ -1,5 +1,7 @@
 import pandas as pd
+import numpy as np
 import datetime
+
 
 class Output(object):
 
@@ -11,10 +13,10 @@ class Output(object):
     def read_sample():
         return pd.read_csv('sample_submission.csv')
 
-    def generate_key(self, cur_date, FIPS):
+    @staticmethod
+    def generate_key(cur_date, FIPS):
         # e.g. 2020-04-01-10001
         return cur_date.strftime('%Y-%m-%d') + '-' + str(int(FIPS))
-        
 
     def modify_submission(self):
         # predicted part
@@ -44,7 +46,7 @@ class Output(object):
         #     percentiles = key_value[key]
         #     for j in range(len(percentiles)):
         #         self.sample.iloc[i, j] = percentiles[j]
-        print(1)
+        pre = np.zeros((len(self.sample), 9))
         for i in range(len(self.sample)):
             if i % 1000 == 0:
                 print("%d/%d" % (i, len(self.sample)))
@@ -53,8 +55,13 @@ class Output(object):
             if key not in key_value:
                 continue
             percentiles = self.generate_percentile(key_value[key])
+            pre[i][:] = percentiles
             # for j in range(len(percentiles)):
-            self.sample.iloc[i, 1:10] = percentiles
+            # self.sample.iloc[i, 1:10] = percentiles
+
+        percentile_keys = ['10', '20', '30', '40', '50', '60', '70', '80', '90']
+        for col in range(9):
+            self.sample[percentile_keys[col]] = pre[:, col]
 
         # ground truth part
         ground_truth = pd.read_csv('data/us/covid/deaths.csv')
@@ -69,7 +76,6 @@ class Output(object):
             for j in range(9):
                 self.sample.iloc[i, j + 1] = percentile[j]
 
-        
     @staticmethod
     def generate_percentile(mid):
         percentile = []
@@ -102,4 +108,3 @@ class Output(object):
 if __name__ == '__main__':
     output = Output()
     output.save_submission()
-    # print(output.generate_percentile(5))
