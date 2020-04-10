@@ -15,7 +15,7 @@ class SEIRSModelClass(object):
             'theta_I': [0.02, 0.02]
         }
         self.initial_parameters = []
-        self.period = 300
+        self.period = 85
         self.last_day = '4/6/2020'
 
     def preprocess(self):
@@ -38,7 +38,7 @@ class SEIRSModelClass(object):
         theta_I = pd.Series([0 for _ in range(county_numbers)], name='theta_I')
         psi_E = pd.Series([0 for _ in range(county_numbers)], name='psi_E')
         psi_I = pd.Series([0 for _ in range(county_numbers)], name='psi_I')
-        initF = pd.Series(countyInfo["death_%s" % self.last_day], name='initF')
+        initF = pd.Series(county_initial_parameters["death_%s" % self.last_day], name='initF')
 
         self.initial_parameters = pd.concat([county_initial_parameters, beta, sigma, gamma, mu_I, xi, sigma_D, theta_E, theta_I, psi_E, psi_I, initF], axis=1)
         self.initial_parameters.to_csv('processed_data/county_initial_parameters.csv', index=False)
@@ -50,7 +50,10 @@ class SEIRSModelClass(object):
         self.initial_parameters = pd.concat([self.initial_parameters, county_initial_confirmed_case], axis=1)
 
         for i in range(county_numbers):
-            self.initial_parameters['init_infected'][i] = county_confirmed_cases.loc[county_confirmed_cases['countyFIPS'] == self.initial_parameters['countyFIPS'][i]][self.last_day]
+            self.initial_parameters['init_infected'][i] = county_confirmed_cases.loc[county_confirmed_cases['countyFIPS'] == self.initial_parameters['countyFIPS'][i]]['4/6/20']
+
+        # TA's bug
+        self.initial_parameters = self.initial_parameters.drop(county_numbers - 1)
 
     def train(self):
         for i in range(len(self.initial_parameters)):
@@ -83,7 +86,7 @@ class SEIRSModelClass(object):
                 initF=self.initial_parameters['initF'][i]
             )
 
-            model.run(T=self.period, checkpoints=self.checkpoints)
+            model.run(T=self.period)
 
             self.models.append(model)
 
@@ -91,7 +94,10 @@ class SEIRSModelClass(object):
         # output = pd.DataFrame()
         death_count = []
         for i in range(len(self.models)):
-            death_count.append([round(death) for death in self.models[i].numF[-14:]])
+            curr_county_death = []
+            for j in range(self.period):
+                curr_county_death.append(self.models[i].numF[(j + 1) * 10])
+            death_count.append(curr_county_death)
         death_count = pd.DataFrame(death_count)
         county_info = self.initial_parameters['countyFIPS']
         output = pd.concat([county_info, death_count], axis=1)
@@ -106,4 +112,4 @@ if __name__ == '__main__':
     seirsModel.preprocess()
     seirsModel.train()
     # seirsModel.visualization()
-    # seirsModel.getDeath()
+    seirsModel.getDeath()
