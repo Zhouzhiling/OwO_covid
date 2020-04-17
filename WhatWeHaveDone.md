@@ -60,6 +60,14 @@ Add a label which indicates if the time series is stationary.
 
 Calculate second order difference if the time series is not stationary.
 
+Create an instance of `StationarityTest`. Call `test()` method to do the adf test. Call `differentiate()` method to make the time series which is not stationary become stationary. Call `output()` method to store our result into a pickle file.
+```
+stationarity = StationarityTest()
+stationarity.test()
+stationarity.differentiate()
+stationarity.output()
+```
+
 # THOUGHTS
 ## Method 1
 Using exponential function to fit the death data of each county.
