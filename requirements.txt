@@ -1,3 +1,5 @@
+numpy
+dtw
 beautifulsoup4
 us
 gitpython
