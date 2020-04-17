@@ -95,4 +95,10 @@ generate different models for different counties
 
 找到多个类的county之后，对每个/每类county做平稳性检验。
 
-如果不平稳，做差分使得平稳；然后套模型
+如果不平稳，做差分使得平稳；然后套模型（LR，Lasso，Ridge）
+
+
+
+### TODO：
+
+正常输出结果
