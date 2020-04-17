@@ -7,7 +7,7 @@ class Output(object):
 
     def __init__(self):
         self.sample = self.read_sample()
-        self.last_day = '4/6/2020'
+        self.last_day = '4/16/2020'
 
     @staticmethod
     def read_sample():
@@ -18,9 +18,9 @@ class Output(object):
         # e.g. 2020-04-01-10001
         return cur_date.strftime('%Y-%m-%d') + '-' + str(int(FIPS))
 
-    def modify_submission(self):
+    def modify_submission(self, source):
         # predicted part
-        predicted = pd.read_csv('processed_data/SEIRS_predictions.csv')
+        predicted = pd.read_csv(source)
         date_time = datetime.datetime.strptime(self.last_day, '%m/%d/%Y')
         key_value = dict()
 
@@ -87,11 +87,13 @@ class Output(object):
 
         return date, FIPS
 
-    def save_submission(self):
-        self.modify_submission()
-        self.sample.to_csv('submission.csv', index=False)
+    def save_submission(self, source):
+        self.modify_submission(source)
+        self.sample.to_csv('submission_regression.csv', index=False)
 
 
 if __name__ == '__main__':
+    # source = 'processed_data/SEIRS_predictions.csv'
+    source = 'processed_data/regression_predictions.csv'
     output = Output()
-    output.save_submission()
+    output.save_submission(source)

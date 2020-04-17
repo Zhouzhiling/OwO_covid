@@ -48,9 +48,10 @@ class Regression(object):
         for i, row in input.iterrows():
             death = row['death_list']
             index = row['countyFIPS']
-            if len(death) <= self.window_size:
-                continue
-            result.append(np.asarray(death[-self.window_size:]))
+            if len(death) < self.window_size:
+                result.append(np.concatenate((np.zeros(self.window_size - len(death)), death[:])))
+            else:
+                result.append(np.asarray(death[-self.window_size:]))
             FIPS.append(index)
         return np.asarray(result), np.asarray(FIPS)
 
@@ -75,13 +76,6 @@ class Regression(object):
             self.intercept_dict[label] = intercept_list.mean(axis=0)
 
     def predict(self, predict_days = 100):
-        # for index, row in self.data.iterrows():
-        #     predicted = []
-        #     coeff = self.coeff_dict[row['class']]
-        #     initial_data = self.get_initial_data(row['death_list'])
-        #     for i in range(predict_days):
-        #         sum(coeff[0] * initial_data)
-
         result = None
         for label in self.class_label:
             print("Predicting for label %d ..." % label)
@@ -95,15 +89,16 @@ class Regression(object):
                 predicted_list[:, day] = predicted
                 X = np.concatenate((np.delete(X, 0, axis=1), predicted.reshape(-1, 1)), axis=1)
 
-            result_array = np.concatenate((FIPS.reshape(-1,1), predicted_list), axis=1)
+            result_array = pd.concat([pd.Series(data=FIPS, name='countyFIPS'), pd.DataFrame(data=predicted_list)], axis=1)
             if result is not None:
                 result = pd.concat([result, pd.DataFrame(result_array)])
             else:
                 result = pd.DataFrame(result_array)
-        return result
 
+        self.save_output(result, './processed_data/regression_predictions.csv')
 
-
+    def save_output(self, data, path):
+        data.to_csv(path, index=False)
 
 
 if __name__ == "__main__":
