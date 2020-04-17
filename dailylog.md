@@ -87,3 +87,12 @@ generate different models for different counties
 
 
 
+# 4.16
+
+### 今日done：
+
+用DTW找到相似的county，用geometry的数据补充相似性。
+
+找到多个类的county之后，对每个/每类county做平稳性检验。
+
+如果不平稳，做差分使得平稳；然后套模型
