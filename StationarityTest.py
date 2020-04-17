@@ -35,6 +35,29 @@ class StationarityTest(object):
 
         self.data = pd.concat([self.data, pd.Series(data=self.is_stationary, name='stationary')], axis=1)
 
+    def differentiate(self):
+        # diffs: second order difference
+        # origin: death on first day
+        # origin_diff_one: first order different on first day
+        diffs = []
+        origin = []
+        origin_diff_one = []
+        for i in range(self.county_number):
+            if self.is_stationary[i]:
+                diffs.append([])
+                origin.append([])
+                origin_diff_one.append([])
+                continue
+            death = self.data['death_list'][i]
+            diff_one = [j - i for i, j in zip(death[: -1], death[1:])]
+            diff_two = [j - i for i, j in zip(diff_one[: -1], diff_one[1:])]
+            origin.append(death[0])
+            origin_diff_one.append(diff_one[0])
+            diffs.append(diff_two)
+
+        self.data = pd.concat([self.data, pd.Series(data=diffs, name='diff'), pd.Series(data=origin, name='origin'),
+                               pd.Series(data=origin_diff_one, name='origin_diff_one')], axis=1)
+
     def output(self):
         self.data.to_pickle(path='processed_data/Stationary/stationary_label_deaths.plk')
 
@@ -42,4 +65,6 @@ class StationarityTest(object):
 if __name__ == '__main__':
     stationarity = StationarityTest()
     stationarity.test()
+    stationarity.differentiate()
+    stationarity.output()
     pass
