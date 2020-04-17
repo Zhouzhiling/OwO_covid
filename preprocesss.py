@@ -177,14 +177,32 @@ class PreProcess(object):
         countyNoneZero = countyNoneZero.reset_index(drop=True)
         return countyNoneZero
 
+    def generate_for_time_series(self):
+        data = self.getNoneZeroData()
+        list_to_append = []
+        for item in data.values:
+            countyFIPS = item[0]
+            deaths = item[4:]
+            startIdx = findFirstNonZero(deaths)
+            x_data = np.array(deaths[startIdx:])
+            list_to_append.append(x_data)
+        data['death_list'] = list_to_append
+        return data[['countyFIPS', 'death_list']]
+
+
 
 if __name__ == '__main__':
     path = './data/us/covid/'
     preprocess = PreProcess(path)
     # preprocess.process()
     # preprocess.visualization()
+
+    # for check and visualization
     # preprocess.checkExponentialFit()
-    preprocess.exponentialFit()
+    # preprocess.exponentialFit()
     # preprocess.getNdarray()
     # tmp = preprocess.getConfirmedDataNdarray()
     # print(tmp.head())
+
+    # 4.16 time series
+    preprocess.generate_for_time_series()
