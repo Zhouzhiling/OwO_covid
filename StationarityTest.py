@@ -1,6 +1,6 @@
-import statsmodels
 from statsmodels.tsa.stattools import adfuller
 import pandas as pd
+import math
 
 
 class StationarityTest(object):
@@ -25,7 +25,9 @@ class StationarityTest(object):
                 self.is_stationary.append(True)
                 continue
             adf = adfuller(self.data['death_list'][i], autolag='AIC')
-            if adf[1] < self.significance:
+            if math.isnan(adf[0]):
+                self.is_stationary.append(True)
+            elif adf[0] < min(adf[4].values()):
                 self.is_stationary.append(True)
             else:
                 self.is_stationary.append(False)

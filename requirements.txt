@@ -1,3 +1,4 @@
+statsmodels
 numpy
 dtw
 beautifulsoup4
