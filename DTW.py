@@ -73,8 +73,8 @@ class DTW(object):
             for county in val:
                 self.data['label'][county] = key
 
-    def output_to_csv(self):
-        self.data.to_csv(path_or_buf='processed_data/DTW/DTW_label_deaths.csv')
+    def output(self):
+        self.data.to_pickle(path='processed_data/DTW/DTW_label_deaths.plk')
 
     def get_DTW_label_data(self):
         return self.data
@@ -83,4 +83,4 @@ class DTW(object):
 if __name__ == '__main__':
     DTWClass = DTW()
     DTWClass.compare_similarity()
-    DTWClass.output_to_csv()
+    DTWClass.output()
