@@ -45,8 +45,9 @@ class Regression(object):
 
     def get_initial_data(self, input):
         result, FIPS = [], []
-        for index, row in input.iterrows():
+        for i, row in input.iterrows():
             death = row['death_list']
+            index = row['countyFIPS']
             if len(death) <= self.window_size:
                 continue
             result.append(np.asarray(death[-self.window_size:]))
@@ -69,8 +70,6 @@ class Regression(object):
                 if score > self.model_selection_threshold:
                     coeff_list.append(coeff)
                     intercept_list.append(intercept)
-                    # score_list.append(score)
-            # get mean value of coeff for current class
             coeff_list, intercept_list = np.asarray(coeff_list), np.asarray(intercept_list)
             self.coeff_dict[label] = coeff_list.mean(axis=0)
             self.intercept_dict[label] = intercept_list.mean(axis=0)
@@ -94,8 +93,7 @@ class Regression(object):
             for day in range(predict_days):
                 predicted = np.sum(X * coeff, axis=1) + intercept
                 predicted_list[:, day] = predicted
-                X = np.delete(X, 0, axis=1)
-                X = np.concatenate((X, predicted.reshape(-1, 1)), axis=1)
+                X = np.concatenate((np.delete(X, 0, axis=1), predicted.reshape(-1, 1)), axis=1)
 
             result_array = np.concatenate((FIPS.reshape(-1,1), predicted_list), axis=1)
             if result is not None:
