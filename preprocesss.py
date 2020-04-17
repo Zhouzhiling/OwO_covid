@@ -189,6 +189,21 @@ class PreProcess(object):
         data['death_list'] = list_to_append
         return data[['countyFIPS', 'death_list']]
 
+    def generate_for_time_series_deleteme(self):
+        data = self.getNoneZeroData()
+        list_to_append = []
+        random = []
+        for item in data.values:
+            countyFIPS = item[0]
+            deaths = item[4:]
+            startIdx = findFirstNonZero(deaths)
+            x_data = np.array(deaths[startIdx:])
+            list_to_append.append(x_data)
+            random.append(countyFIPS % 4)
+        data['death_list'] = list_to_append
+        data['class'] = random
+        return data[['countyFIPS', 'death_list', 'class']]
+
 
 
 if __name__ == '__main__':
