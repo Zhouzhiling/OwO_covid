@@ -95,7 +95,9 @@ class Regression(object):
             else:
                 result = pd.DataFrame(result_array)
 
-        self.save_output(result, './processed_data/regression_predictions.csv')
+        path = './processed_data/regression_predictions.csv'
+        self.save_output(result, path)
+        return path
 
     def save_output(self, data, path):
         data.to_csv(path, index=False)

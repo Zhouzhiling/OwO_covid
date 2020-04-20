@@ -1,4 +1,6 @@
 from statsmodels.tsa.stattools import adfuller
+import regression_model
+import numpy as np
 import pandas as pd
 import math
 
@@ -61,10 +63,59 @@ class StationarityTest(object):
     def output(self):
         self.data.to_pickle(path='processed_data/Stationary/stationary_label_deaths.plk')
 
+    def generate_output(self, path):
+        result = None
+        predicted = pd.read_csv(path)
+        for i in range(self.county_number):
+            FIPS = self.data['countyFIPS'][i]
+            increases = self.data.loc[self.data['countyFIPS'] == FIPS].values[1:]
+            origin_one = self.data.loc[self.data['countyFIPS'] == FIPS]['origin_diff_one'].values
+            origin = self.data.loc[self.data['countyFIPS'] == FIPS]['origin'].values
+            predicted_list = self.reverse(increases, origin_one, origin)
+
+            result_array = pd.concat([pd.Series(data=FIPS, name='countyFIPS'), pd.DataFrame(data=predicted_list)],
+                                     axis=1)
+            if result is not None:
+                result = pd.concat([result, pd.DataFrame(result_array)])
+            else:
+                result = pd.DataFrame(result_array)
+
+        path = './processed_data/regression_submission.csv'
+        self.save_output(result, path)
+
+
+    def save_output(self, data, path):
+        data.to_csv(path, index=False)
+
+
+    def reverse(self, increases, origin_one, origin):
+        output = np.zeros(1, len(increases)+2)
+        output[0] = origin
+        output[1] = origin_one
+        for i, n in enumerate(increases):
+            output[i+2] = output[i+1] + increases[i]
+            output[i+1] = output[i] + output[i+1]
+        return output
+
+
+
+
+
+
 
 if __name__ == '__main__':
     stationarity = StationarityTest()
     stationarity.test()
     stationarity.differentiate()
     stationarity.output()
+
+    # regression = regression_model.Regression()
+    # regression.load_data()
+    # regression.process_data()
+    # regression.train('LinearRegression')
+    # path = regression.predict(100)
+
+    path = './processed_data/regression_predictions.csv'
+    # stationarity.generate_output(path)
+
     pass
