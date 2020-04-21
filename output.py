@@ -20,7 +20,11 @@ class Output(object):
 
     def modify_submission(self, source):
         # predicted part
-        predicted = pd.read_csv(source)
+        if isinstance(source, str):
+            predicted = pd.read_csv(source)
+        else:
+            predicted = source
+
         date_time = datetime.datetime.strptime(self.last_day, '%m/%d/%Y')
         key_value = dict()
 
