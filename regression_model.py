@@ -104,10 +104,10 @@ class Regression(object):
             intercept = self.intercept_dict[label]
             data_this_label = self.data.loc[self.data['label'] == label]
 
-            station_data = data_this_label.loc[data_this_label['stationary'] == True]
-            non_station_data = data_this_label.loc[data_this_label['stationary'] == False]
+            station_data = data_this_label.loc[data_this_label['stationary']==True]
+            non_station_data = data_this_label.loc[data_this_label['stationary']==False]
 
-            deaths = [station_data, non_station_data]
+            deaths = [non_station_data, station_data]
 
             for i in range(2):
                 if deaths[i].empty:
@@ -130,6 +130,7 @@ class Regression(object):
         diff_value = pd.read_pickle(path)
         for i in range(len(self.result)):
             FIPS = self.result['countyFIPS'][i]
+
             increases = self.result.loc[self.result['countyFIPS'] == FIPS].values[0][2:]
             station_info = diff_value.loc[diff_value['countyFIPS'] == FIPS]
 
@@ -162,6 +163,9 @@ class Regression(object):
             for i, n in enumerate(increases):
                 output[i+2] = increases[i]
 
+        for i, n in enumerate(output):
+            output[i] = max(0, output[i])
+
         return np.asarray(output[2:]).reshape((1, -1))
 
     @staticmethod
@@ -172,6 +176,6 @@ class Regression(object):
 if __name__ == "__main__":
     regression = Regression()
     regression.load_data()
-    regression.train('LinearRegression')
+    regression.train('Lasso')
     regression.predict(100)
     regression.generate_output('processed_data/Stationary/stationary_label_deaths.plk')

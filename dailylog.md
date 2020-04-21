@@ -102,3 +102,17 @@ generate different models for different counties
 ### TODO：
 
 正常输出结果
+
+
+
+
+
+## 4.20
+
+跑通了linearregression和lasso，输出了结果并上传了。
+
+### TODO
+
+解决很多预测值为0的问题（过拟合？
+
+调参
