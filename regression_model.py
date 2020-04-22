@@ -3,8 +3,6 @@ import pandas as pd
 from collections import defaultdict
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.metrics import r2_score
-
-import preprocesss
 import output as op
 
 
@@ -13,7 +11,7 @@ class Regression(object):
         self.data = None
         self.window_size = 3
         self.class_label = None     # set with unique labels
-        self.model_selection_threshold = 0.1
+        self.model_selection_threshold = 0
         # first item is stationary, second is non-stationary
         self.coeff_dict = defaultdict(lambda: [0, 0])
         self.intercept_dict = defaultdict(lambda: [0, 0])
@@ -22,6 +20,11 @@ class Regression(object):
     def load_data(self, path='processed_data/Stationary/stationary_label_deaths.plk'):
         self.data = pd.read_pickle(path)
         self.class_label = set(self.data['label'].values)
+
+    def check_DTW(self):
+        for label in self.class_label:
+            count = sum(self.data['label'] == label)
+            print('%d counties for label %d' % (count, label))
 
     def generate_input(self, deaths):
         length = len(deaths)
@@ -39,18 +42,20 @@ class Regression(object):
         elif model_type == 'Lasso':
             reg = Lasso(alpha=2.0).fit(X, Y)
         else:
-            reg = Ridge(alpha=10).fit(X, Y)
+            reg = Ridge(alpha=1.0).fit(X, Y)
 
         score = r2_score(Y, reg.predict(X))
 
         return reg.coef_, reg.intercept_, score
-        # cur_coeff = reg.coef_
-        # cur_score = reg.score(X, Y)
 
-    def get_seed(self, input):
+    def get_seed(self, data, station):
+        data = data[station]
         result, FIPS = [], []
-        for i, row in input.iterrows():
-            death = row['death_list']
+        for i, row in data.iterrows():
+            if station == 0:
+                death = row['diff']
+            else:
+                death = row['death_list']
             index = row['countyFIPS']
             if len(death) < self.window_size:
                 result.append(np.concatenate((np.zeros(self.window_size - len(death)), death[:])))
@@ -65,7 +70,6 @@ class Regression(object):
             print("Training for label %d ..." % label)
             coeff_list, intercept_list = [[], []], [[], []]
             item_info = self.data.loc[self.data['label'] == label]
-
             # go through all data
             for idx in range(len(item_info)):
                 stationary = item_info['stationary'].values[idx]
@@ -77,16 +81,16 @@ class Regression(object):
                     data = item_info['diff'].values[idx]
 
                 if len(data) <= self.window_size:
-                    continue
+                    data = np.append(np.zeros((1, self.window_size-len(data)+1)), data)
 
                 X, Y = self.generate_input(data)
                 coeff, intercept, score = self.train_specific_model(X, Y, model_type)
 
                 # only keep the model with high score
                 # TODO: evaluation, or loss
-                if abs(score) > self.model_selection_threshold:
-                    coeff_list[stationary].append(coeff)
-                    intercept_list[stationary].append(intercept)
+                # if abs(score) > -1:
+                coeff_list[stationary].append(coeff)
+                intercept_list[stationary].append(intercept)
 
             self.store_into_dict(label, coeff_list, intercept_list)
 
@@ -99,7 +103,6 @@ class Regression(object):
     def predict(self, predict_days=100):
         for label in self.class_label:
             print("Predicting for label %d ..." % label)
-
             # coeff and intercept ars list with 2 values
             coeff = self.coeff_dict[label]
             intercept = self.intercept_dict[label]
@@ -113,11 +116,11 @@ class Regression(object):
             for i in range(2):
                 if deaths[i].empty:
                     continue
-                X, FIPS = self.get_seed(deaths[i])
+                X, FIPS = self.get_seed(deaths, i)
                 predicted_list = np.zeros((len(X), predict_days))
 
                 for day in range(predict_days):
-                    predicted = np.sum(X * coeff[i], axis=1) + intercept[i]
+                    predicted = np.sum(X * coeff[i], axis=1) + intercept[i][0]
                     predicted_list[:, day] = predicted
                     X = np.concatenate((np.delete(X, 0, axis=1), predicted.reshape(-1, 1)), axis=1)
 
@@ -139,7 +142,7 @@ class Regression(object):
 
             result = pd.concat([result, pd.DataFrame(item)])
 
-        pd.to_csv(result, './delete.csv')
+        result.to_csv('./delete.csv', index=False)
         output = op.Output()
         output.save_submission(result)
 
@@ -160,13 +163,16 @@ class Regression(object):
             output[1] = origin_one
             for i, n in enumerate(increases):
                 output[i+2] = output[i+1] + increases[i]
-                output[i+1] = output[i] + output[i+1]
+
+            for i in range(len(increases)+1):
+                output[i+1] += output[i]
+
         else:
             for i, n in enumerate(increases):
                 output[i+2] = increases[i]
 
-        # for i, n in enumerate(output):
-        #     output[i] = max(0, output[i])
+        for i, n in enumerate(increases):
+            output[i+2] = max(output[i+1], output[i+2])
 
         return np.asarray(output[2:]).reshape((1, -1))
 
@@ -178,6 +184,7 @@ class Regression(object):
 if __name__ == "__main__":
     regression = Regression()
     regression.load_data()
+    # regression.check_DTW()
     regression.train('Ridge')
     regression.predict(100)
     regression.generate_output('processed_data/Stationary/stationary_label_deaths.plk')
