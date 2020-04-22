@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 from collections import defaultdict
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, mean_squared_error
+from itertools import compress
 import output as op
 
 
@@ -44,9 +45,9 @@ class Regression(object):
         else:
             reg = Ridge(alpha=1.0).fit(X, Y)
 
-        score = r2_score(Y, reg.predict(X))
+        loss = mean_squared_error(Y, reg.predict(X))
 
-        return reg.coef_, reg.intercept_, score
+        return reg.coef_, reg.intercept_, loss
 
     def get_seed(self, data, station):
         data = data[station]
@@ -68,11 +69,12 @@ class Regression(object):
         # tmp load data
         for label in self.class_label:
             print("Training for label %d ..." % label)
-            coeff_list, intercept_list = [[], []], [[], []]
+            coeff_list, intercept_list, loss_list = [[], []], [[], []], [[], []]
             item_info = self.data.loc[self.data['label'] == label]
             # go through all data
             for idx in range(len(item_info)):
-                stationary = item_info['stationary'].values[idx]
+
+                stationary = bool(item_info['stationary'].values[idx])
 
                 # check whether current item is stationary or not
                 if stationary:
@@ -84,19 +86,29 @@ class Regression(object):
                     data = np.append(np.zeros((1, self.window_size-len(data)+1)), data)
 
                 X, Y = self.generate_input(data)
-                coeff, intercept, score = self.train_specific_model(X, Y, model_type)
-
-                # only keep the model with high score
-                # TODO: evaluation, or loss
-                # if abs(score) > -1:
+                coeff, intercept, loss = self.train_specific_model(X, Y, model_type)
                 coeff_list[stationary].append(coeff)
                 intercept_list[stationary].append(intercept)
+                loss_list[stationary].append(loss)
 
+            coeff_list, intercept_list = self.model_selection(coeff_list, intercept_list, loss_list)
             self.store_into_dict(label, coeff_list, intercept_list)
+
+    @staticmethod
+    def model_selection(coeff_list, intercept_list, loss_list):
+        for i in range(2):
+            if len(loss_list[i]) == 0:
+                return coeff_list, intercept_list
+            median = np.median(loss_list[i])
+            coeff_list[i] = np.asarray(list(compress(coeff_list[i], list(loss_list[i] <= median))))
+            intercept_list[i] = np.asarray(list(compress(intercept_list[i], list(loss_list[i] <= median))))
+        return coeff_list, intercept_list
 
     def store_into_dict(self, label, coeff_list, intercept_list):
         for stationary in range(2):
             coeff_val, intercept_val = np.asarray(coeff_list[stationary]), np.asarray(intercept_list[stationary])
+            if len(intercept_list[stationary]) == 0:
+                continue
             self.coeff_dict[label][stationary] = coeff_val.mean(axis=0)
             self.intercept_dict[label][stationary] = intercept_val.mean(axis=0)
 
