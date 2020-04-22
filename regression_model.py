@@ -11,9 +11,9 @@ import output as op
 class Regression(object):
     def __init__(self):
         self.data = None
-        self.window_size = 5
+        self.window_size = 3
         self.class_label = None     # set with unique labels
-        self.model_selection_threshold = 0
+        self.model_selection_threshold = 0.1
         # first item is stationary, second is non-stationary
         self.coeff_dict = defaultdict(lambda: [0, 0])
         self.intercept_dict = defaultdict(lambda: [0, 0])
@@ -37,9 +37,9 @@ class Regression(object):
         if model_type == 'LinearRegression':
             reg = LinearRegression().fit(X, Y)
         elif model_type == 'Lasso':
-            reg = Lasso().fit(X, Y)
+            reg = Lasso(alpha=2.0).fit(X, Y)
         else:
-            reg = Ridge().fit(X, Y)
+            reg = Ridge(alpha=10).fit(X, Y)
 
         score = r2_score(Y, reg.predict(X))
 
@@ -83,7 +83,8 @@ class Regression(object):
                 coeff, intercept, score = self.train_specific_model(X, Y, model_type)
 
                 # only keep the model with high score
-                if score > self.model_selection_threshold:
+                # TODO: evaluation, or loss
+                if abs(score) > self.model_selection_threshold:
                     coeff_list[stationary].append(coeff)
                     intercept_list[stationary].append(intercept)
 
@@ -138,6 +139,7 @@ class Regression(object):
 
             result = pd.concat([result, pd.DataFrame(item)])
 
+        pd.to_csv(result, './delete.csv')
         output = op.Output()
         output.save_submission(result)
 
@@ -163,8 +165,8 @@ class Regression(object):
             for i, n in enumerate(increases):
                 output[i+2] = increases[i]
 
-        for i, n in enumerate(output):
-            output[i] = max(0, output[i])
+        # for i, n in enumerate(output):
+        #     output[i] = max(0, output[i])
 
         return np.asarray(output[2:]).reshape((1, -1))
 
@@ -176,6 +178,6 @@ class Regression(object):
 if __name__ == "__main__":
     regression = Regression()
     regression.load_data()
-    regression.train('Lasso')
+    regression.train('Ridge')
     regression.predict(100)
     regression.generate_output('processed_data/Stationary/stationary_label_deaths.plk')

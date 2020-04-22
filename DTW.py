@@ -40,7 +40,8 @@ class DTW(object):
         distances = np.fromiter(self.distances.values(), dtype=float)
         self.average = np.mean(distances)
         self.std = np.std(distances)
-        self.threshold = max(0.0, self.average / self.std)
+        # self.threshold = max(0.0, 2 * self.average / self.std)
+        self.threshold = max(0.0, self.average)
 
     def compare_similarity(self):
         self.calculate_distance()

@@ -107,7 +107,7 @@ generate different models for different counties
 
 
 
-## 4.20
+# 4.20
 
 跑通了linearregression和lasso，输出了结果并上传了。
 
@@ -116,3 +116,28 @@ generate different models for different counties
 解决很多预测值为0的问题（过拟合？
 
 调参
+
+
+
+# 4.21
+
+DTW里的threshold，分类的个数（4-5类？）
+
+
+
+了解一下平稳性检验的置信度看是不是要调
+
+
+
+regression中的惩罚项
+
+ridge alpha=20， 有负数
+
+
+
+window的长度
+
+
+
+
+

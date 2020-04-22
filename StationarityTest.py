@@ -23,7 +23,9 @@ class StationarityTest(object):
         self.load_data()
 
         for i in range(self.county_number):
-            if len(self.data['death_list'][i]) <= 3:
+            # if i == 302:
+            #     print(1)
+            if len(self.data['death_list'][i]) <= 3 or all(self.data['death_list'][i] == self.data['death_list'][i][0]):
                 self.is_stationary.append(True)
                 continue
             adf = adfuller(self.data['death_list'][i], autolag='AIC')
