@@ -18,6 +18,12 @@ class Output(object):
         # e.g. 2020-04-01-10001
         return cur_date.strftime('%Y-%m-%d') + '-' + str(int(FIPS))
 
+    def calculate_diff(self, predicted):
+        FIPS = predicted['countyFIPS']
+        diff_value = predicted.iloc[:,1:].diff(axis=1)
+        return pd.concat([FIPS, diff_value.iloc[:, 1:]], axis=1)
+
+
     def modify_submission(self, source):
         # predicted part
         if isinstance(source, str):
@@ -27,6 +33,8 @@ class Output(object):
 
         date_time = datetime.datetime.strptime(self.last_day, '%m/%d/%Y')
         key_value = dict()
+
+        predicted = self.calculate_diff(predicted)
 
         for infos in predicted.values:
             FIPS, deaths = infos[0], infos[1:]
@@ -44,25 +52,25 @@ class Output(object):
                 print("%d/%d" % (i, len(self.sample)))
 
             key = self.sample['id'][i]
-            if key not in key_value:
+            if key not in key_value or key_value[key]<0:
                 continue
             percentiles = self.generate_percentile(key_value[key])
             pre[i][:] = percentiles
 
-        # ground truth part
-        ground_truth = pd.read_csv('data/us/covid/deaths.csv')
-        for i in range(len(self.sample)):
-            date, FIPS = self.format_key(self.sample['id'][i])
-            if date not in ground_truth or int(FIPS) not in ground_truth['countyFIPS']:
-                continue
-            if len(ground_truth.loc[ground_truth['countyFIPS'] == int(FIPS)][date].values) == 0:
-                continue
-            average = ground_truth.loc[ground_truth['countyFIPS'] == int(FIPS)][date].values[0]
-            percentiles = self.generate_percentile(average)
-            pre[i][:] = percentiles
-            # for j in range(9):
-            #     self.sample.iloc[i, j + 1] = percentile[j]
-
+        # # ground truth part
+        # ground_truth = pd.read_csv('data/us/covid/deaths.csv')
+        # for i in range(len(self.sample)):
+        #     date, FIPS = self.format_key(self.sample['id'][i])
+        #     if date not in ground_truth or int(FIPS) not in ground_truth['countyFIPS']:
+        #         continue
+        #     if len(ground_truth.loc[ground_truth['countyFIPS'] == int(FIPS)][date].values) == 0:
+        #         continue
+        #     average = ground_truth.loc[ground_truth['countyFIPS'] == int(FIPS)][date].values[0]
+        #     percentiles = self.generate_percentile(average)
+        #     pre[i][:] = percentiles
+        #     # for j in range(9):
+        #     #     self.sample.iloc[i, j + 1] = percentile[j]
+        #
         percentile_keys = ['10', '20', '30', '40', '50', '60', '70', '80', '90']
         for col in range(9):
             self.sample[percentile_keys[col]] = pre[:, col]
