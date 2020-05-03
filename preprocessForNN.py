@@ -15,9 +15,13 @@ class PreprocessForNN(object):
         pass
 
     def load_icu_dict(self):
+        # TODO:
+        # generate a dict, key = countyFIPS, value = icu_bed_count
         pass
 
-    def load_confirmed_dict(self):
+    def load_population_dict(self):
+        # TODO:
+        # generate a dict, key = countyFIPS, value = population
         pass
 
 
