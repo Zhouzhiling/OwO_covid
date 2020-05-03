@@ -1,9 +1,9 @@
-import pandas as pd
 from keras import Model
 from keras.layers import Dense, Input
 from keras.optimizers import Adam
 from keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint
 from keras.models import load_model
+from preprocessForNN import PreprocessForNN
 
 
 class DNN(object):
@@ -11,11 +11,12 @@ class DNN(object):
     def __init__(self):
         pass
 
-    def load_data(self):
+    @staticmethod
+    def load_data():
 
-        feature, label = [], []
+        preprocess = PreprocessForNN()
 
-        return feature, label
+        return preprocess.generate()
 
     def train(self):
 
@@ -85,11 +86,14 @@ class DNN(object):
 
         model.save('models/DNN/dnn_model.hdf5')
 
-    def predict(self):
+    @staticmethod
+    def predict():
         feature = []
 
         model = load_model('models/DNN/dnn_model.hdf5')
         pre = model.predct(feature)
+
+        return pre
 
 
 if __name__ == '__main__':
