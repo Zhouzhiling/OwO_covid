@@ -13,12 +13,12 @@ class PreprocessForNN(object):
         self.population_over_sixty = defaultdict(int)
 
     def load_data(self):
-        self.load_death_and_confirmed()
         self.load_beds_dict()
-        self.load_death_and_confirmed()
         self.load_population_dict()
 
     def load_death_and_confirmed(self):
+        data = pd.DataFrame()
+        return data
         pass
 
     def load_beds_dict(self):
@@ -35,6 +35,29 @@ class PreprocessForNN(object):
         for item in population.iterrows():
             self.total_population[item[1]['FIPS']] = item[1]['total_pop']
             self.population_over_sixty[item[1]['FIPS']] = item[1]['60plus']
+
+    def merge(self):
+        self.load_data()
+        data = self.load_death_and_confirmed()
+
+        confirmed_key = ''
+        death_key = ''
+
+        feature, label = [], []
+
+        for item in data.iterrows():
+            FIPS = item[1]['FIPS']
+            point = item[1][confirmed_key]
+            point.append(self.icu_beds[FIPS])
+            point.append(self.staffed_beds[FIPS])
+            point.append(self.licensed_beds[FIPS])
+            point.append(self.total_population[FIPS])
+            point.append(self.population_over_sixty[FIPS])
+
+            feature.append(point)
+            label.append(item[1][death_key])
+
+        return np.array(feature), np.array(label)
 
 
 if __name__ == "__main__":
