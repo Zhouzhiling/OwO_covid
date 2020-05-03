@@ -92,14 +92,14 @@ class PreprocessForNN(object):
         self.load_data()
         data = self.load_death_and_confirmed()
 
-        confirmed_key = ''
-        death_key = ''
+        confirmed_death_feature_key = 'feature'
+        death_key = 'label'
 
         feature, label = [], []
 
         for item in data.iterrows():
             FIPS = item[1]['FIPS']
-            point = item[1][confirmed_key]
+            point = item[1][confirmed_death_feature_key]
             point.append(self.icu_beds[FIPS])
             point.append(self.staffed_beds[FIPS])
             point.append(self.licensed_beds[FIPS])

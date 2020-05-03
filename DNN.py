@@ -15,7 +15,7 @@ class DNN(object):
 
         feature, label = self.preprocess.generate_training_data()
 
-        input_data = Input(shape=(16,))
+        input_data = Input(shape=(19,))
 
         d = Dense(
             units=32,
@@ -93,4 +93,4 @@ class DNN(object):
 if __name__ == '__main__':
     dnn = DNN()
     dnn.train()
-    dnn.predict()
+    # dnn.predict()
