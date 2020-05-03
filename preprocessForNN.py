@@ -19,3 +19,8 @@ class PreprocessForNN(object):
 
     def load_confirmed_dict(self):
         pass
+
+
+if __name__ == "__main__":
+    preprocess = PreprocessForNN()
+    preprocess.load_data()
