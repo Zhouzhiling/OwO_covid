@@ -1,10 +1,10 @@
 import pandas as pd
 import numpy as np
 import datetime
+from scipy import stats
 
 
 class Output(object):
-
     def __init__(self):
         self.sample = self.read_sample()
         self.last_day = '4/16/2020'
@@ -18,6 +18,12 @@ class Output(object):
         # e.g. 2020-04-01-10001
         return cur_date.strftime('%Y-%m-%d') + '-' + str(int(FIPS))
 
+    def calculate_diff(self, predicted):
+        FIPS = predicted['countyFIPS']
+        diff_value = predicted.iloc[:,1:].diff(axis=1)
+        return pd.concat([FIPS, diff_value.iloc[:, 1:]], axis=1)
+
+
     def modify_submission(self, source):
         # predicted part
         if isinstance(source, str):
@@ -27,6 +33,8 @@ class Output(object):
 
         date_time = datetime.datetime.strptime(self.last_day, '%m/%d/%Y')
         key_value = dict()
+
+        predicted = self.calculate_diff(predicted)
 
         for infos in predicted.values:
             FIPS, deaths = infos[0], infos[1:]
@@ -44,12 +52,12 @@ class Output(object):
                 print("%d/%d" % (i, len(self.sample)))
 
             key = self.sample['id'][i]
-            if key not in key_value:
+            if key not in key_value or key_value[key]<0:
                 continue
             percentiles = self.generate_percentile(key_value[key])
             pre[i][:] = percentiles
 
-        # ground truth part
+        # # ground truth part
         ground_truth = pd.read_csv('data/us/covid/deaths.csv')
         for i in range(len(self.sample)):
             date, FIPS = self.format_key(self.sample['id'][i])
@@ -68,12 +76,16 @@ class Output(object):
             self.sample[percentile_keys[col]] = pre[:, col]
 
     @staticmethod
-    def generate_percentile(mid):
-        percentile = []
-        unit = mid / 5.0
-        for i in range(9):
-            percentile.append(unit * (i+1))
-        return percentile
+    def generate_percentile(mid, mode='Norm', std = 1):
+        if mode == 'Norm':
+            percentile = stats.norm.ppf(np.linspace(0.1, 0.9, 9)) * std + mid
+        else:
+            percentile = []
+            unit = mid / 5.0
+            for i in range(9):
+                percentile.append(unit * (i+1))
+            return percentile
+
 
     @staticmethod
     def format_key(key):

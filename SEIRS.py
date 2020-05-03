@@ -111,5 +111,5 @@ if __name__ == '__main__':
     seirsModel = SEIRSModelClass()
     seirsModel.preprocess()
     seirsModel.train()
-    # seirsModel.visualization()
-    seirsModel.getDeath()
+    seirsModel.visualization()
+    # seirsModel.getDeath()

@@ -3,4 +3,10 @@
 .idea
 *.pyc
 *.vscode
+<<<<<<< HEAD
 
+=======
+.idea/
+*.pyc
+benchmark_models/*.csv
+>>>>>>> upstream/master
