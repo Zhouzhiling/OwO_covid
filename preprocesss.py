@@ -161,11 +161,7 @@ class PreProcess(object):
         countyNoneZero = self.deathData.loc[self.deathData[last_date] != 0]
         countyZero = self.deathData.loc[self.deathData[last_date] == 0]
         countyNoneZero.reset_index(drop=True)
-        # countyZero.reset_index()
-        # countyNoneZero.drop('index')
-
         countyZero.reset_index(drop=True)
-        # countyZero.drop('index')
 
         countyNoneZero.to_csv('./processed_data/death_nonzero.csv', index=False)
         countyZero.to_csv('./processed_data/death_zero.csv', index=False)
