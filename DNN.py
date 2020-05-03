@@ -16,7 +16,7 @@ class DNN(object):
 
         preprocess = PreprocessForNN()
 
-        return preprocess.generate()
+        return preprocess.generate_training_data()
 
     def train(self):
 
