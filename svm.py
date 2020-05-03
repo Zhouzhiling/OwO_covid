@@ -5,7 +5,7 @@ from preprocessForNN import PreprocessForNN
 class SVM(object):
 
     def __init__(self):
-        self.clf = svm.SVC(probability=True)
+        self.clf = svm.SVR()
         self.preprocess = PreprocessForNN()
 
     def train(self):
