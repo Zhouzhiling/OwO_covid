@@ -36,7 +36,7 @@ class PreprocessForNN(object):
             self.total_population[item[1]['FIPS']] = item[1]['total_pop']
             self.population_over_sixty[item[1]['FIPS']] = item[1]['60plus']
 
-    def merge(self):
+    def generate(self):
         self.load_data()
         data = self.load_death_and_confirmed()
 
