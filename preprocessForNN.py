@@ -31,7 +31,6 @@ class PreprocessForNN(object):
             keep_flag.append(int(FIPS) in self.valid_FIPS)
         self.confimedData = self.confirmedData.loc[keep_flag, :]
 
-
     @staticmethod
     def add_window(FIPS, death_list, confirmed_list):
         window_size_7 = 7
@@ -62,8 +61,8 @@ class PreprocessForNN(object):
         for FIPS in self.valid_FIPS:
             if FIPS == 0:
                 continue
-            death_list = self.deathData.loc[self.deathData['countyFIPS'] == FIPS].values[0][4:]
-            confimed_list = self.confirmedData.loc[self.confirmedData['countyFIPS'] == FIPS].values[0][4:]
+            death_list = list(self.deathData.loc[self.deathData['countyFIPS'] == FIPS].values[0][4:])
+            confimed_list = list(self.confirmedData.loc[self.confirmedData['countyFIPS'] == FIPS].values[0][4:])
             cur_res = self.add_window(FIPS, death_list, confimed_list)
             # output.append(cur_res)
             if output is None:
@@ -123,3 +122,4 @@ class PreprocessForNN(object):
 if __name__ == "__main__":
     preprocess = PreprocessForNN()
     preprocess.load_data()
+    preprocess.generate_training_data()
