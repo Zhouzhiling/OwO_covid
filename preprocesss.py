@@ -134,7 +134,6 @@ class PreProcess(object):
             res.append(np.asarray([countyFIPS] + [int(round(tmp)) for tmp in x_predict]))
         pd.DataFrame(res).to_csv('exponential_output.csv', index=False)
 
-
     def checkExponentialFit(self):
         countyName = 'Orleans Parish'
         countyData = self.deathData.loc[self.deathData['County Name'] == 'Orleans Parish']
