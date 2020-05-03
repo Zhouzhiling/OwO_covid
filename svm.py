@@ -6,17 +6,11 @@ class SVM(object):
 
     def __init__(self):
         self.clf = svm.SVC(probability=True)
-
-    @staticmethod
-    def load_data():
-
-        preprocess = PreprocessForNN()
-
-        return preprocess.generate_training_data()
+        self.preprocess = PreprocessForNN()
 
     def train(self):
 
-        feature, label = self.load_data()
+        feature, label = self.preprocess.generate_training_data()
 
         self.clf.fit(feature, label)
 
@@ -26,9 +20,11 @@ class SVM(object):
 
     def test(self):
 
-        feature = []
+        feature, FIPS = self.preprocess.generate_testing_data()
 
         pre = self.clf.predict(feature)
+
+        # todo save results
 
         return pre
 

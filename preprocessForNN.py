@@ -59,6 +59,14 @@ class PreprocessForNN(object):
 
         return np.array(feature), np.array(label)
 
+    def generate_testing_data(self):
+
+        # todo add implementation
+
+        feature, FIPS = [], []
+
+        return feature, FIPS
+
 
 if __name__ == "__main__":
     preprocess = PreprocessForNN()

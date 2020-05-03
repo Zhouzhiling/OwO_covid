@@ -9,18 +9,11 @@ from preprocessForNN import PreprocessForNN
 class DNN(object):
 
     def __init__(self):
-        pass
-
-    @staticmethod
-    def load_data():
-
-        preprocess = PreprocessForNN()
-
-        return preprocess.generate_training_data()
+        self.preprocess = PreprocessForNN()
 
     def train(self):
 
-        feature, label = self.load_data()
+        feature, label = self.preprocess.generate_training_data()
 
         input_data = Input(shape=(16,))
 
@@ -86,12 +79,13 @@ class DNN(object):
 
         model.save('models/DNN/dnn_model.hdf5')
 
-    @staticmethod
-    def predict():
-        feature = []
+    def predict(self):
+        feature, FIPS = self.preprocess.generate_testing_data()
 
         model = load_model('models/DNN/dnn_model.hdf5')
         pre = model.predct(feature)
+
+        # todo save results
 
         return pre
 
