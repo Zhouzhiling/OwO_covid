@@ -41,7 +41,7 @@ class PreprocessForNN(object):
         label_list = []
         feature_list = []
         for i in range(count):
-            feature = np.append(confirmed_list[i:i+window_size_7], death_list[i:i+window_size_7])
+            feature = confirmed_list[i:i+window_size_7] + death_list[i:i+window_size_7]
             label = death_list[i+window_size_7:i+window_size_7+window_size_14]
             FIPS_list.append(FIPS)
             label_list.append(label)
