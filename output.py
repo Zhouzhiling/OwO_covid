@@ -76,7 +76,7 @@ class Output(object):
             self.sample[percentile_keys[col]] = pre[:, col]
 
     @staticmethod
-    def generate_percentile(mid, mode='Norm', std = 1):
+    def generate_percentile(mid, mode='Norm', std=10):
         if mode == 'Norm':
             percentile = stats.norm.ppf(np.linspace(0.1, 0.9, 9)) * std + mid
         else:
@@ -105,7 +105,7 @@ class Output(object):
 
     def save_submission(self, source):
         self.modify_submission(source)
-        self.sample.to_csv('submission_regression.csv', index=False)
+        self.sample.to_csv('deleteme.csv', index=False)
 
 
 if __name__ == '__main__':

@@ -141,6 +141,10 @@ window的长度
 
 run dnn
 
+当前label长度为14，没有删除全零的情况，共10万条数据
+
+删除全零的label之后还剩3万条数据
+
 
 
 ## Related File: 
@@ -151,13 +155,13 @@ preprocessForNN.py + DNN.py
 
 ## TODO
 
-pinball
+pinball loss
 
 add more feature to train DNN
 
-modify special counties (New York etc.)
+特征工程（归一化ect）
 
+smooth the input by rolling mean
 
-
-
+modify special counties (New York etc.) by hand
 

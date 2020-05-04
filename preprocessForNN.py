@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 from collections import defaultdict
+import datetime
+import os.path
 
 
 class PreprocessForNN(object):
@@ -43,6 +45,8 @@ class PreprocessForNN(object):
         for i in range(count):
             feature = confirmed_list[i:i+window_size_7] + death_list[i:i+window_size_7]
             label = death_list[i+window_size_7:i+window_size_7+window_size_14]
+            if sum(label) == 0:
+                continue
             FIPS_list.append(FIPS)
             label_list.append(label)
             feature_list.append(feature)
@@ -53,17 +57,24 @@ class PreprocessForNN(object):
 
     def load_death_and_confirmed(self):
         # return dataframe ['FIPS', 'label', 'feature']
-        path = './data/us/covid/'
-        self.deathData = pd.read_csv(path + 'deaths.csv')
-        self.confirmedData = pd.read_csv(path + 'confirmed_cases.csv')
+        path = './processed_data/'
+        death_path = path + 'daily_death_from_nyu.csv'
+        confirmed_path = path + 'daily_confirmed_from_nyu.csv'
+
+        if not os.path.isfile(death_path):
+            self.transform_format('death')
+            self.transform_format('confirmed')
+
+        self.deathData = pd.read_csv(death_path)
+        self.confirmedData = pd.read_csv(confirmed_path)
         self.fetch_none_zero_data()
         output = None
         for FIPS in self.valid_FIPS:
             if FIPS == 0:
                 continue
             death_list = list(self.deathData.loc[self.deathData['countyFIPS'] == FIPS].values[0][4:])
-            confimed_list = list(self.confirmedData.loc[self.confirmedData['countyFIPS'] == FIPS].values[0][4:])
-            cur_res = self.add_window(FIPS, death_list, confimed_list)
+            confirmed_list = list(self.confirmedData.loc[self.confirmedData['countyFIPS'] == FIPS].values[0][4:])
+            cur_res = self.add_window(FIPS, death_list, confirmed_list)
             # output.append(cur_res)
             if output is None:
                 output = cur_res
@@ -118,8 +129,60 @@ class PreprocessForNN(object):
 
         return feature, FIPS
 
+    @staticmethod
+    def transform_format(mode='death'):
+        '''
+        The evaluation data is from ./data/us/covid/nyt_us_counties_daily
+        The data we employed for training is ./data/us/covid/deaths
+        This function transform nyt_us_counties_daily into the foramt of deaths
+        Store the result in csv named ./data/us/covid/nyt_deaths
+        :return:
+        '''
+
+        if mode == 'death':
+            out_path = './processed_data/daily_death_from_nyu.csv'
+        else:
+            out_path = './processed_data/daily_confirmed_from_nyu.csv'
+
+        template_path = './data/us/covid/deaths.csv'
+        source_path = './data/us/covid/nyt_us_counties_daily.csv'
+
+        template = pd.read_csv(template_path)
+        source = pd.read_csv(source_path)
+
+        pre = np.zeros((len(template), len(template.columns)-4))
+
+        first_day = datetime.datetime.strptime(template.columns[4], '%m/%d/%Y')
+        fips_idx = dict()
+
+        for i in range(len(template)):
+            fips_idx[template['countyFIPS'][i]] = i
+
+        for infos in source.values:
+            FIPS = infos[0]
+            date = datetime.datetime.strptime(infos[1], '%Y-%m-%d')
+            if mode == 'death':
+                value = infos[5]
+            else:
+                value = infos[4]
+
+            date_index = (date - first_day).days
+            if date_index >= 0 and FIPS in fips_idx:
+                fips_index = fips_idx[FIPS]
+                pre[fips_index][date_index] = value
+
+        for day_diff in range(len(template.columns)-4):
+            day_to_add = datetime.timedelta(days=day_diff)
+            label_name = (day_to_add + first_day).strftime('%#m/%#d/%Y')
+            template[label_name] = pre[:, day_diff]
+
+        template.to_csv(out_path, index=False)
+
 
 if __name__ == "__main__":
     preprocess = PreprocessForNN()
+    # preprocess.transform_format('death')
+    # preprocess.transform_format('confirmed')
+
     preprocess.load_data()
     preprocess.generate_training_data()
