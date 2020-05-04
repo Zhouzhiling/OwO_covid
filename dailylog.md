@@ -121,17 +121,15 @@ generate different models for different counties
 
 # 4.21
 
-DTW里的threshold，分类的个数（4-5类？）
+✅DTW里的threshold，分类的个数（4-5类？）
 
-了解一下平稳性检验的置信度看是不是要调
+✅了解一下平稳性检验的置信度看是不是要调
 
+✅regression中的惩罚项
 
+✅ridge alpha=20， 有负数
 
-regression中的惩罚项
-
-ridge alpha=20， 有负数
-
-window的长度
+✅window的长度
 
 
 
@@ -139,11 +137,13 @@ window的长度
 
 ## Done: 
 
-run dnn
+✅run dnn
 
-当前label长度为14，没有删除全零的情况，共10万条数据
+当前label长度为14：
 
-删除全零的label之后还剩3万条数据
+没有删除全零的时候，共10万条数据
+
+删除全零的label之后，还剩3万条数据👈当前采用。
 
 
 
@@ -155,13 +155,29 @@ preprocessForNN.py + DNN.py
 
 ## TODO
 
-pinball loss
+✅pinball loss
 
-add more feature to train DNN
+❌add more feature to train DNN
 
-特征工程（归一化ect）
+❌特征工程（归一化ect）
 
-smooth the input by rolling mean
+❌smooth the input by rolling mean
 
-modify special counties (New York etc.) by hand
+❌modify special counties (New York etc.) by hand
+
+# 5.4
+
+用于evaluation的数据来源是nyt_us_counties_daily.csv，和当前用的deahts.csv的不同在于
+
+> nyt_us_counties_daily是每日新增的数据，deahts是累计到当日的数据
+>
+> 数据来源不同导致每日新增的death数目也不完全相同。
+
+于是在preprocessForNN里面加了一个transform_format函数，用于生成./processed_data/daily_death_from_nyu.csv和daily_confirmed_from_nyu.csv数据。
+
+数据格式和之前的deaths.csv/confirmed_cases.csv相同，数据来源是nyt_us_counties_daily，保存的是每日的新增数据。
+
+之后每次更新完数据生成两个文件就可。
+
+
 
