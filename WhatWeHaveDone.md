@@ -68,7 +68,21 @@ stationarity.differentiate()
 stationarity.output()
 ```
 
+
+
+## DNN
+
+Code in DNN.py
+
+```python
+dnn = DNN()
+dnn.train()
+```
+
+
+
 # THOUGHTS
+
 ## Method 1
 Using exponential function to fit the death data of each county.
 

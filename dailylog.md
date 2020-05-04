@@ -123,8 +123,6 @@ generate different models for different counties
 
 DTW里的threshold，分类的个数（4-5类？）
 
-
-
 了解一下平稳性检验的置信度看是不是要调
 
 
@@ -133,9 +131,31 @@ regression中的惩罚项
 
 ridge alpha=20， 有负数
 
-
-
 window的长度
+
+
+
+# 5.3
+
+## Done: 
+
+run dnn
+
+
+
+## Related File: 
+
+preprocessForNN.py + DNN.py
+
+
+
+## TODO
+
+pinball
+
+add more feature to train DNN
+
+modify special counties (New York etc.)
 
 
 
