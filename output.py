@@ -5,7 +5,8 @@ from scipy import stats
 
 
 class Output(object):
-    def __init__(self):
+    def __init__(self, flag_calculate_diff=False):
+        self.flag_calculate_diff = flag_calculate_diff
         self.sample = self.read_sample()
         self.last_day = '4/16/2020'
 
@@ -34,7 +35,8 @@ class Output(object):
         date_time = datetime.datetime.strptime(self.last_day, '%m/%d/%Y')
         key_value = dict()
 
-        predicted = self.calculate_diff(predicted)
+        if self.flag_calculate_diff:
+            predicted = self.calculate_diff(predicted)
 
         for infos in predicted.values:
             FIPS, deaths = infos[0], infos[1:]
