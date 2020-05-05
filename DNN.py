@@ -18,12 +18,17 @@ class DNN(object):
         input_data = Input(shape=(19,))
 
         d = Dense(
-            units=32,
+            units=1000,
             activation='relu'
         )(input_data)
 
         d = Dense(
-            units=16,
+            units=200,
+            activation='relu'
+        )(d)
+
+        d = Dense(
+            units=50,
             activation='relu'
         )(d)
 
@@ -53,7 +58,7 @@ class DNN(object):
             ),
             EarlyStopping(
                 monitor='loss',
-                patience=10,
+                patience=20,
                 verbose=1
             )
         ]
@@ -61,7 +66,7 @@ class DNN(object):
         model.compile(
             optimizer=adam,
             loss='mse',
-            metrics='loss'
+            metrics=['mse']
         )
 
         model.summary()
@@ -71,9 +76,8 @@ class DNN(object):
             y=label,
             epochs=100,
             verbose=1,
-            validation_split=0.1,
             shuffle=True,
-            batch_size=4,
+            batch_size=32,
             callbacks=callbacks
         )
 
