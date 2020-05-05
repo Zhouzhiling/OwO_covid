@@ -179,5 +179,9 @@ preprocessForNN.py + DNN.py
 
 之后每次更新完数据生成两个文件就可。
 
+---
 
+修改了DNN模型结构，复杂++。
+
+把每个county的policy加到DNN的feature中。
 

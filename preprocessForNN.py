@@ -35,8 +35,7 @@ class PreprocessForNN(object):
         '''
         policy = pd.read_csv(filepath_or_buffer='data/us/other/policies.csv')
         label_names = ['stay at home', '>50 gatherings', '>500 gatherings',
-                       'public schools', 'restaurant dine-in', 'entertainment/gym',
-                       'federal guidelines', 'foreign travel ban']
+                       'public schools', 'restaurant dine-in', 'entertainment/gym']
         mean_times = [0 for _ in range(len(label_names))]
         ranges = [0 for _ in range(len(label_names))]
         min_times = [0 for _ in range(len(label_names))]
