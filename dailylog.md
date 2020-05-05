@@ -185,3 +185,28 @@ preprocessForNN.py + DNN.py
 
 把每个county的policy加到DNN的feature中。
 
+
+
+## 5.5
+
+### TA建议：
+
+burning的county用最简单的函数拟合。然后用机器学习筛选出outbreak的county单独的训练模型做预测。
+
+多尝试不同的模型和数据，不建议花很多时间在单个模型调参上。
+
+mobility数据建议尝试使用
+
+cluster county是个好的想法
+
+---
+
+train	test
+
+outbreak: 109 28
+
+burning: 8501 / 267
+
+
+
+1411个county累计有死亡记录
