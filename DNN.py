@@ -11,12 +11,13 @@ class DNN(object):
 
     def __init__(self):
         self.preprocess = PreprocessForNN()
+        self.mode = 'outbreak'
 
     def train(self):
 
-        feature, label = self.preprocess.generate_training_data()
+        feature, label = self.preprocess.generate_training_data(mode=self.mode)
 
-        input_data = Input(shape=(51,))
+        input_data = Input(shape=(53,))
 
         d = Dense(
             units=200,
@@ -81,7 +82,7 @@ class DNN(object):
         model.save('models/DNN/dnn_model.hdf5')
 
     def predict(self):
-        feature, FIPS = self.preprocess.generate_testing_data()
+        feature, FIPS = self.preprocess.generate_testing_data(mode=self.mode)
 
         model = load_model('models/DNN/dnn_model.hdf5')
         pre = model.predict(feature)
@@ -97,5 +98,5 @@ class DNN(object):
 
 if __name__ == '__main__':
     dnn = DNN()
-    # dnn.train()
-    dnn.predict()
+    dnn.train()
+    # dnn.predict()

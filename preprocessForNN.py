@@ -77,7 +77,7 @@ class PreprocessForNN(object):
         last_date = self.deathData.columns[-1]
         countyNoneZero = self.deathData.loc[self.deathData[last_date] != 0]
         countyNoneZero.reset_index(drop=True)
-        self.valid_FIPS = set(countyNoneZero['countyFIPS'])
+        self.valid_FIPS = set(self.deathData['countyFIPS'])
         self.deathData = countyNoneZero
 
         keep_flag = []
@@ -127,7 +127,8 @@ class PreprocessForNN(object):
 
         self.deathData = pd.read_csv(death_path)
         self.confirmedData = pd.read_csv(confirmed_path)
-        self.fetch_none_zero_data()
+        self.valid_FIPS = set(self.deathData['countyFIPS'])
+        # self.fetch_none_zero_data()
         output = None
         for FIPS in self.valid_FIPS:
             if FIPS == 0:
