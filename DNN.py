@@ -13,22 +13,17 @@ class DNN(object):
 
     def train(self):
 
-        feature, label = self.preprocess.generate_training_data('')
+        feature, label = self.preprocess.generate_training_data()
 
         input_data = Input(shape=(27,))
 
         d = Dense(
-            units=1000,
+            units=200,
             activation='relu'
         )(input_data)
 
         d = Dense(
-            units=200,
-            activation='relu'
-        )(d)
-
-        d = Dense(
-            units=50,
+            units=100,
             activation='relu'
         )(d)
 

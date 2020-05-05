@@ -4,6 +4,7 @@ from collections import defaultdict
 import datetime
 import math
 import os.path
+from sklearn.preprocessing import StandardScaler
 
 
 class PreprocessForNN(object):
@@ -18,6 +19,8 @@ class PreprocessForNN(object):
         self.total_population = defaultdict(int)
         self.population_over_sixty = defaultdict(int)
         self.policies = defaultdict(lambda: [0 for _ in range(8)])
+        self.scaler_feature = StandardScaler()
+        self.scaler_label = StandardScaler()
 
     def load_policies(self):
         '''
@@ -126,32 +129,12 @@ class PreprocessForNN(object):
             self.staffed_beds[item[1]['FIPS']] = item[1]['staffed_beds']
             self.licensed_beds[item[1]['FIPS']] = item[1]['licensed_beds']
 
-        maximum_icu_beds = max(self.icu_beds.values())
-        for k, v in self.icu_beds.items():
-            self.icu_beds[k] = v / maximum_icu_beds
-
-        maximum_staffed_beds = max(self.staffed_beds.values())
-        for k, v in self.staffed_beds.items():
-            self.staffed_beds[k] = v / maximum_staffed_beds
-
-        maximum_licensed_beds = max(self.licensed_beds.values())
-        for k, v in self.licensed_beds.items():
-            self.licensed_beds[k] = v / maximum_licensed_beds
-
     def load_population_dict(self):
         # load population from 'county_populations.csv'
         population = pd.read_csv(filepath_or_buffer='data/us/demographics/county_populations.csv')
         for item in population.iterrows():
             self.total_population[item[1]['FIPS']] = item[1]['total_pop']
             self.population_over_sixty[item[1]['FIPS']] = item[1]['60plus']
-
-        maximum_total_population = max(self.total_population.values())
-        for k, v in self.total_population.items():
-            self.total_population[k] = v / maximum_total_population
-
-        maximum_population_over_sixty = max(self.population_over_sixty.values())
-        for k, v in self.population_over_sixty.items():
-            self.population_over_sixty[k] = v / maximum_population_over_sixty
 
     def generate_training_data(self, mode='outbreak'):
         self.load_data()
@@ -189,9 +172,17 @@ class PreprocessForNN(object):
                 burning_label.append(label[i])
 
         if mode == 'outbreak':
-            return np.array(outbreak_feature), np.array(outbreak_label)
+            scalered_feature = np.array(outbreak_feature)
+            scalered_label = np.array(outbreak_label)
+            scalered_feature = self.scaler_feature.fit_transform(scalered_feature)
+            scalered_label = self.scaler_label.fit_transform(scalered_label)
+            return scalered_feature, scalered_label
         else:
-            return np.array(burning_feature), np.array(burning_label)
+            scalered_feature = np.array(burning_feature)
+            scalered_label = np.array(burning_label)
+            scalered_feature = self.scaler_feature.fit_transform(scalered_feature)
+            scalered_label = self.scaler_label.fit_transform(scalered_label)
+            return scalered_feature, scalered_label
 
     def generate_testing_data(self):
 
