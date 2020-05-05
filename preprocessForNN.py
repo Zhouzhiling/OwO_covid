@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from collections import defaultdict
 import datetime
+import math
 import os.path
 
 
@@ -16,10 +17,44 @@ class PreprocessForNN(object):
         self.licensed_beds = defaultdict(int)
         self.total_population = defaultdict(int)
         self.population_over_sixty = defaultdict(int)
+        self.policies = defaultdict(lambda: [0 for _ in range(8)])
+
+    def load_policies(self):
+        '''
+        dict[key][0] = stay at home
+        dict[key][1] = >50 gathering
+        dict[key][2] = >500 gathering
+        dict[key][3] = public schools
+        dict[key][4] = restaurant dine-in
+        dict[key][5] = entertainment/gym
+        dict[key][6] = federal guidelines
+        dict[key][7] = foreign travel ban
+        '''
+        policy = pd.read_csv(filepath_or_buffer='data/us/other/policies.csv')
+        label_names = ['stay at home', '>50 gatherings', '>500 gatherings',
+                       'public schools', 'restaurant dine-in', 'entertainment/gym',
+                       'federal guidelines', 'foreign travel ban']
+        mean_times = [0 for _ in range(len(label_names))]
+        ranges = [0 for _ in range(len(label_names))]
+        min_times = [0 for _ in range(len(label_names))]
+
+        for idx, label in enumerate(label_names):
+            times = policy[label].values[~np.isnan(policy[label])]
+            mean_times[idx] = np.mean(times)
+            ranges[idx] = max(1, np.max(times) - np.min(times))
+            min_times[idx] = np.min(times)
+
+        for item in policy.iterrows():
+            fips = item[1]['FIPS']
+            for idx, label in enumerate(label_names):
+                if not math.isnan(item[1][label]):
+                    scaled = 1 - (item[1][label] - min_times[idx]) / ranges[idx]
+                    self.policies[fips][idx] = scaled
 
     def load_data(self):
         self.load_beds_dict()
         self.load_population_dict()
+        self.load_policies()
 
     def fetch_none_zero_data(self):
         last_date = self.deathData.columns[-1]
@@ -135,6 +170,7 @@ class PreprocessForNN(object):
             point.append(self.licensed_beds[FIPS])
             point.append(self.total_population[FIPS])
             point.append(self.population_over_sixty[FIPS])
+            point.extend(self.policies[FIPS])
 
             feature.append(point)
             label.append(item[1][death_key])
