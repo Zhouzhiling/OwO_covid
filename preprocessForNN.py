@@ -71,7 +71,7 @@ class PreprocessForNN(object):
         self.confimedData = self.confirmedData.loc[keep_flag, :]
 
     @staticmethod
-    def add_window(FIPS, death_list, confirmed_list):
+    def add_window(FIPS, death_list, confirmed_list, mode):
         window_size_7 = 7
         window_size_14 = 14
         count = len(death_list) - window_size_7 - window_size_14 + 1
@@ -79,20 +79,26 @@ class PreprocessForNN(object):
         FIPS_list = []
         label_list = []
         feature_list = []
-        for i in range(count):
-            feature = confirmed_list[i:i+window_size_7] + death_list[i:i+window_size_7]
-            label = death_list[i+window_size_7:i+window_size_7+window_size_14]
-            if sum(label) == 0:
-                continue
+        if mode == 'train':
+            for i in range(count):
+                feature = confirmed_list[i:i+window_size_7] + death_list[i:i+window_size_7]
+                label = death_list[i+window_size_7:i+window_size_7+window_size_14]
+                if sum(label) == 0:
+                    continue
+                FIPS_list.append(FIPS)
+                label_list.append(label)
+                feature_list.append(feature)
+            dict = {'FIPS': FIPS_list, 'label': label_list, 'feature': feature_list}
+        else:
+            feature = confirmed_list[-window_size_7:] + death_list[-window_size_7:]
             FIPS_list.append(FIPS)
-            label_list.append(label)
             feature_list.append(feature)
+            dict = {'FIPS': FIPS_list, 'feature': feature_list}
 
-        dict = {'FIPS': FIPS_list, 'label': label_list, 'feature': feature_list}
         output = pd.DataFrame(dict)
         return output
 
-    def load_death_and_confirmed(self):
+    def load_death_and_confirmed(self, mode='train'):
         # return dataframe ['FIPS', 'label', 'feature']
         path = './processed_data/'
         death_path = path + 'daily_death_from_nyu.csv'
@@ -111,8 +117,7 @@ class PreprocessForNN(object):
                 continue
             death_list = list(self.deathData.loc[self.deathData['countyFIPS'] == FIPS].values[0][4:])
             confirmed_list = list(self.confirmedData.loc[self.confirmedData['countyFIPS'] == FIPS].values[0][4:])
-            cur_res = self.add_window(FIPS, death_list, confirmed_list)
-            # output.append(cur_res)
+            cur_res = self.add_window(FIPS, death_list, confirmed_list, mode)
             if output is None:
                 output = cur_res
             else:
@@ -183,13 +188,47 @@ class PreprocessForNN(object):
             scalered_label = self.scaler_label.fit_transform(scalered_label)
             return scalered_feature, scalered_label
 
-    def generate_testing_data(self):
+    def generate_testing_data(self, mode='outbreak'):
 
-        # todo add implementation
+        self.load_data()
+        data = self.load_death_and_confirmed('test')
+        confirmed_death_feature_key = 'feature'
+        feature, FIPS_list = [], []
 
-        feature, FIPS = [], []
+        for item in data.iterrows():
+            FIPS = item[1]['FIPS']
+            point = item[1][confirmed_death_feature_key]
+            point.append(self.icu_beds[FIPS])
+            point.append(self.staffed_beds[FIPS])
+            point.append(self.licensed_beds[FIPS])
+            point.append(self.total_population[FIPS])
+            point.append(self.population_over_sixty[FIPS])
+            point.extend(self.policies[FIPS])
 
-        return feature, FIPS
+            feature.append(point)
+            FIPS_list.append(FIPS)
+
+        threshold = 10
+
+        outbreak_feature, outbreak_FIPS = [], []
+        burning_feature, burning_FIPS = [], []
+
+        for i in range(len(feature)):
+            if np.max(feature[i][13]) > threshold:
+                outbreak_feature.append(feature[i])
+                outbreak_FIPS.append(FIPS_list[i])
+            else:
+                burning_feature.append(feature[i])
+                burning_FIPS.append(FIPS_list[i])
+
+        if mode == 'outbreak':
+            scalered_feature = np.array(outbreak_feature)
+            scalered_feature = self.scaler_feature.fit_transform(scalered_feature)
+            return scalered_feature, pd.Series(outbreak_FIPS)
+        else:
+            scalered_feature = np.array(burning_feature)
+            scalered_feature = self.scaler_feature.fit_transform(scalered_feature)
+            return scalered_feature, pd.Series(burning_FIPS)
 
     @staticmethod
     def transform_format(mode='death'):
@@ -247,4 +286,5 @@ if __name__ == "__main__":
     # preprocess.transform_format('confirmed')
 
     preprocess.load_data()
-    preprocess.generate_training_data()
+    # preprocess.generate_training_data()
+    preprocess.generate_testing_data()
