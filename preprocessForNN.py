@@ -157,7 +157,7 @@ class PreprocessForNN(object):
             feature.append(point)
             label.append(item[1][death_key])
 
-        threshold = 10
+        threshold = 100
 
         outbreak_feature, outbreak_label = [], []
         burning_feature, burning_label = [], []

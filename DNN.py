@@ -4,6 +4,7 @@ from keras.optimizers import Adam
 from keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint
 from keras.models import load_model
 from preprocessForNN import PreprocessForNN
+import pandas as pd
 
 
 class DNN(object):
@@ -28,7 +29,8 @@ class DNN(object):
         )(d)
 
         output = Dense(
-            units=14
+            units=14,
+            activation='softmax'
         )(d)
 
         model = Model(input_data, output)
@@ -69,7 +71,7 @@ class DNN(object):
         model.fit(
             x=feature,
             y=label,
-            epochs=1000,
+            epochs=100,
             verbose=1,
             shuffle=True,
             batch_size=1,
@@ -84,7 +86,11 @@ class DNN(object):
         model = load_model('models/DNN/dnn_model.hdf5')
         pre = model.predct(feature)
 
-        # todo save results
+        prediction = pd.DataFrame(pre, index=False)
+
+        result = pd.concat([FIPS, prediction], axis=1, ignore_index=True)
+
+        result.to_csv('models/DNN/prediction.csv')
 
         return pre
 
