@@ -13,7 +13,7 @@ class DNN(object):
 
     def train(self):
 
-        feature, label = self.preprocess.generate_training_data()
+        feature, label = self.preprocess.generate_training_data('')
 
         input_data = Input(shape=(19,))
 
@@ -45,7 +45,7 @@ class DNN(object):
                 filepath='models/DNN/dnn.hdf5',
                 save_best_only=True,
                 verbose=1,
-                period=5,
+                period=1,
                 monitor='loss'
             ),
             ReduceLROnPlateau(
@@ -74,10 +74,10 @@ class DNN(object):
         model.fit(
             x=feature,
             y=label,
-            epochs=100,
+            epochs=1000,
             verbose=1,
             shuffle=True,
-            batch_size=32,
+            batch_size=1,
             callbacks=callbacks
         )
 

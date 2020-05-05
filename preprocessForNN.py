@@ -118,7 +118,7 @@ class PreprocessForNN(object):
         for k, v in self.population_over_sixty.items():
             self.population_over_sixty[k] = v / maximum_population_over_sixty
 
-    def generate_training_data(self):
+    def generate_training_data(self, mode='outbreak'):
         self.load_data()
         data = self.load_death_and_confirmed()
 
@@ -139,7 +139,23 @@ class PreprocessForNN(object):
             feature.append(point)
             label.append(item[1][death_key])
 
-        return np.array(feature), np.array(label)
+        threshold = 10
+
+        outbreak_feature, outbreak_label = [], []
+        burning_feature, burning_label = [], []
+
+        for i in range(len(feature)):
+            if np.max(label[i]) > threshold:
+                outbreak_feature.append(feature[i])
+                outbreak_label.append(label[i])
+            else:
+                burning_feature.append(feature[i])
+                burning_label.append(label[i])
+
+        if mode == 'outbreak':
+            return np.array(outbreak_feature), np.array(outbreak_label)
+        else:
+            return np.array(burning_feature), np.array(burning_label)
 
     def generate_testing_data(self):
 
