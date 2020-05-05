@@ -84,18 +84,18 @@ class DNN(object):
         feature, FIPS = self.preprocess.generate_testing_data()
 
         model = load_model('models/DNN/dnn_model.hdf5')
-        pre = model.predct(feature)
+        pre = model.predict(feature)
 
-        prediction = pd.DataFrame(pre, index=False)
+        prediction = pd.DataFrame(pre, index=None)
 
         result = pd.concat([FIPS, prediction], axis=1, ignore_index=True)
 
-        result.to_csv('models/DNN/prediction.csv')
+        result.to_csv('models/DNN/prediction.csv', index=False)
 
         return pre
 
 
 if __name__ == '__main__':
     dnn = DNN()
-    dnn.train()
-    # dnn.predict()
+    # dnn.train()
+    dnn.predict()
