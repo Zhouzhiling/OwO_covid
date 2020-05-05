@@ -16,7 +16,7 @@ class DNN(object):
 
         feature, label = self.preprocess.generate_training_data()
 
-        input_data = Input(shape=(25,))
+        input_data = Input(shape=(51,))
 
         d = Dense(
             units=200,

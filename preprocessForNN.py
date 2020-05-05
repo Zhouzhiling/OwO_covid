@@ -7,6 +7,21 @@ import os.path
 from sklearn.preprocessing import StandardScaler
 
 
+def feature_engineering(feature):
+    # confirmed, death, confirmed_diff, death_diff, confirmed_square, death_square
+    diff = [0 for _ in range(12)]
+    squared = [0 for _ in range(14)]
+    for idx in range(2):
+        for i in range(1, 7):
+            diff[idx * 6 + i - 1] = feature[idx * 7 + i] - feature[idx * 7 + i - 1]
+    feature.extend(diff)
+
+    for i in range(14):
+        squared[i] = feature[i] * feature[i]
+    feature.extend(squared)
+
+    return feature
+
 class PreprocessForNN(object):
 
     def __init__(self):
@@ -82,6 +97,7 @@ class PreprocessForNN(object):
         if mode == 'train':
             for i in range(count):
                 feature = confirmed_list[i:i+window_size_7] + death_list[i:i+window_size_7]
+                feature = feature_engineering(feature)
                 label = death_list[i+window_size_7:i+window_size_7+window_size_14]
                 if sum(label) == 0:
                     continue
@@ -91,6 +107,7 @@ class PreprocessForNN(object):
             dict = {'FIPS': FIPS_list, 'label': label_list, 'feature': feature_list}
         else:
             feature = confirmed_list[-window_size_7:] + death_list[-window_size_7:]
+            feature = feature_engineering(feature)
             FIPS_list.append(FIPS)
             feature_list.append(feature)
             dict = {'FIPS': FIPS_list, 'feature': feature_list}
@@ -124,6 +141,7 @@ class PreprocessForNN(object):
                 output = pd.concat([output, cur_res])
 
         return output
+
 
     def load_beds_dict(self):
         # load number of beds from 'beds_by_county.csv'
