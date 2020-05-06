@@ -67,10 +67,16 @@ def generate_day_tag(start_date, predicted_length):
 if __name__ == '__main__':
     pred_file = 'tmp.csv'
 
+    # for consecutive several days
     # start_date = '2020-04-14'
     # predicted_length = 14
     # date_list = generate_day_tag(start_date, predicted_length)
+    # for day in date_list:
+    #     scores = score_all_predictions(pred_file, '2020-04-28', '2020-04-27', key='deaths')
+    #     scores_mse = score_all_predictions(pred_file, '2020-04-28', '2020-04-27', key='deaths', mse=True)
+    #     print("Day %s: pinball=%f mse=%f" % (day, scores[0], scores_mse[0]))
 
+    # for single day
     scores = score_all_predictions(pred_file, '2020-04-28', '2020-04-27', key='deaths')
     scores_mse = score_all_predictions(pred_file, '2020-04-28', '2020-04-27', key='deaths', mse=True)
-    print(scores[0], scores_mse[0])
+    print("pinball=%f mse=%f" % (scores[0], scores_mse[0]))
