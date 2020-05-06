@@ -98,5 +98,5 @@ class DNN(object):
 
 if __name__ == '__main__':
     dnn = DNN()
-    dnn.train()
-    # dnn.predict()
+    # dnn.train()
+    dnn.predict()
