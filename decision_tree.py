@@ -2,12 +2,15 @@ import pandas as pd
 import numpy as np
 from sklearn.tree import DecisionTreeRegressor
 from preprocessForNN import PreprocessForNN
+import output
 
 
 class DecisionTree(object):
 
     def __init__(self):
-        self.clf = DecisionTreeRegressor()
+        self.clf = []
+        for i in range(14):
+            self.clf.append(DecisionTreeRegressor())
         self.preprocess = PreprocessForNN()
         self.mode = 'outbreak'
         pass
@@ -18,24 +21,58 @@ class DecisionTree(object):
         for day in range(14):
             label = np.array([labels[k][0] for k in range(len(labels))])
             print(label)
-            self.clf.fit(feature, label)
-            acc = round(self.clf.score(feature, label) * 100, 2)
+            self.clf[day].fit(feature, label)
+            acc = round(self.clf[day].score(feature, label) * 100, 2)
             print('Day: %d acc: %f' % (day, acc))
 
     def test(self):
         feature, FIPS = self.preprocess.generate_testing_data(mode=self.mode)
-        pre = self.clf.predict(feature)
-        print(pre)
+        predictions = []
+        for day in range(14):
+            prediction = self.clf[day].predict(feature)
+            std = self.preprocess.get_std()
+            average = self.preprocess.get_average()
+            prediction = np.round(prediction * std[day] + average[day])
+            predictions.append(prediction)
 
-        # probability = pd.Series([i[0] for i in probability], name='DT_probability').to_frame()
-        # probability.to_csv(path_or_buf='probability/DT_probability.csv', index=False)
+        predictions = np.array(predictions)
+        predictions = np.reshape(predictions, (len(predictions[0]), len(predictions)))
 
-        # prediction = pd.Series((i for i in pre), name='Survived')
-        # submission = pd.concat([FIPS, prediction], axis=1)
-        # submission.to_csv(path_or_buf='data/DT_submission.csv', index=False)
+        prediction = pd.DataFrame(predictions, index=None)
+
+        result = pd.concat([FIPS, prediction], axis=1, ignore_index=True)
+        result = result.rename(
+            columns={
+                0: 'countyFIPS',
+                1: 0,
+                2: 1,
+                3: 2,
+                4: 3,
+                5: 4,
+                6: 5,
+                7: 6,
+                8: 7,
+                9: 8,
+                10: 9,
+                11: 10,
+                12: 11,
+                13: 12,
+                14: 13
+            }
+        )
+
+        result.to_csv('models/DT/dt.csv', index=False)
+
+    def generate_output(self):
+        source = 'models/DT/dt.csv'
+        dst = 'submissions/dt.csv'
+        Output = output.Output()
+        Output.save_submission(source, dst)
+
 
 
 if __name__ == '__main__':
     ti = DecisionTree()
     ti.train()
     ti.test()
+    ti.generate_output()

@@ -8,7 +8,7 @@ class Output(object):
     def __init__(self, flag_calculate_diff=False):
         self.flag_calculate_diff = flag_calculate_diff
         self.sample = self.read_sample()
-        self.last_day = '4/16/2020'
+        self.last_day = '4/27/2020'
 
     @staticmethod
     def read_sample():
@@ -78,15 +78,15 @@ class Output(object):
             self.sample[percentile_keys[col]] = pre[:, col]
 
     @staticmethod
-    def generate_percentile(mid, mode='Norm', std=10):
+    def generate_percentile(mid, mode='Norm', std=1):
         if mode == 'Norm':
-            percentile = stats.norm.ppf(np.linspace(0.1, 0.9, 9)) * std + mid
+            percentile = list(stats.norm.ppf(np.linspace(0.1, 0.9, 9)) * std + mid)
         else:
             percentile = []
             unit = mid / 5.0
             for i in range(9):
                 percentile.append(unit * (i+1))
-            return percentile
+        return percentile
 
 
     @staticmethod
@@ -105,13 +105,14 @@ class Output(object):
 
         return date, FIPS
 
-    def save_submission(self, source):
+    def save_submission(self, source, dst):
         self.modify_submission(source)
-        self.sample.to_csv('deleteme.csv', index=False)
+        self.sample.to_csv(dst, index=False)
 
 
 if __name__ == '__main__':
     # source = 'processed_data/SEIRS_predictions.csv'
-    source = 'processed_data/regression_predictions.csv'
+    source = 'models/SVM/svm.csv'
+    dst = 'models/DT/dt.csv'
     output = Output()
-    output.save_submission(source)
+    output.save_submission(source, dst)

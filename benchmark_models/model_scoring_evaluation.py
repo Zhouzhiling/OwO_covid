@@ -67,10 +67,10 @@ def generate_day_tag(start_date, predicted_length):
 if __name__ == '__main__':
     pred_file = 'tmp.csv'
 
-    start_date = '2020-04-14'
-    predicted_length = 14
-    date_list = generate_day_tag(start_date, predicted_length)
+    # start_date = '2020-04-14'
+    # predicted_length = 14
+    # date_list = generate_day_tag(start_date, predicted_length)
 
-    scores = score_all_predictions(pred_file, '2020-04-14', '2020-04-13', key='deaths')
-    scores_mse = score_all_predictions(pred_file, '2020-04-14', '2020-04-13', key='deaths', mse=True)
+    scores = score_all_predictions(pred_file, '2020-04-28', '2020-04-27', key='deaths')
+    scores_mse = score_all_predictions(pred_file, '2020-04-28', '2020-04-27', key='deaths', mse=True)
     print(scores[0], scores_mse[0])
