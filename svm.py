@@ -1,35 +1,50 @@
 from sklearn import svm
 from preprocessForNN import PreprocessForNN
+import pandas as pd
+import numpy as np
 
 
 class SVM(object):
 
     def __init__(self):
-        self.clf = svm.SVR()
+        self.clfs = []
         self.preprocess = PreprocessForNN()
 
     def train(self):
 
         feature, label = self.preprocess.generate_training_data()
 
-        self.clf.fit(feature, label)
+        for i in range(14):
+            clf = svm.SVR()
+            clf.fit(feature, label[:, i])
 
-        acc = round(self.clf.score(feature, label) * 100, 2)
+            acc = round(clf.score(feature, label[:, i]) * 100, 2)
 
-        print('Training acc: %f' % acc)
+            print('Date: %d. Training acc: %f' % (i, acc))
+
+            self.clfs.append(clf)
 
     def test(self):
 
         feature, FIPS = self.preprocess.generate_testing_data()
 
-        pre = self.clf.predict(feature)
+        predictions = []
 
-        # todo save results
+        for i in range(14):
+            pre = self.clfs[i].predict(feature)
+            predictions.append(pre)
 
-        return pre
+        predictions = np.array(predictions)
+        predictions = np.reshape(predictions, (len(predictions[0]), len(predictions)))
+
+        prediction = pd.DataFrame(predictions, index=None)
+
+        result = pd.concat([FIPS, prediction], axis=1, ignore_index=True)
+
+        result.to_csv('models/SVM/svm.csv', index=False)
 
 
 if __name__ == '__main__':
-    svm = SVM()
-    svm.train()
-    svm.test()
+    s = SVM()
+    s.train()
+    s.test()
