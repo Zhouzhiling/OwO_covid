@@ -43,6 +43,25 @@ class SVM(object):
         prediction = pd.DataFrame(predictions, index=None)
 
         result = pd.concat([FIPS, prediction], axis=1, ignore_index=True)
+        result = result.rename(
+            columns={
+                0: 'countyFIPS',
+                1: 0,
+                2: 1,
+                3: 2,
+                4: 3,
+                5: 4,
+                6: 5,
+                7: 6,
+                8: 7,
+                9: 8,
+                10: 9,
+                11: 10,
+                12: 11,
+                13: 12,
+                14: 13
+            }
+        )
 
         result.to_csv('models/SVM/svm.csv', index=False)
 
