@@ -298,6 +298,12 @@ class PreprocessForNN(object):
 
         template.to_csv(out_path, index=False)
 
+    def get_average(self):
+        return self.scaler_label.mean_
+
+    def get_std(self):
+        return np.sqrt(self.scaler_label.var_)
+
 
 if __name__ == "__main__":
     preprocess = PreprocessForNN()

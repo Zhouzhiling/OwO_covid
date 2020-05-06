@@ -32,6 +32,9 @@ class SVM(object):
 
         for i in range(14):
             pre = self.clfs[i].predict(feature)
+            std = self.preprocess.get_std()
+            average = self.preprocess.get_average()
+            pre = np.round(pre * std[i] + average[i])
             predictions.append(pre)
 
         predictions = np.array(predictions)
