@@ -55,7 +55,7 @@ def pinball_loss(preds, true_val, p_vals=np.arange(0.1, 1.0, 0.1)):
 
 
 def generate_day_tag(start_date, predicted_length):
-    first_day = datetime.datetime.strptime(start_date, '%m/%d/%Y')
+    first_day = datetime.datetime.strptime(start_date, '%Y-%m-%d')
     labels = []
     for i in range(predicted_length):
         day_to_add = datetime.timedelta(days=i)
@@ -65,18 +65,21 @@ def generate_day_tag(start_date, predicted_length):
 
 
 if __name__ == '__main__':
-    pred_file = 'tmp.csv'
+    pred_file = '../submissions/dt.csv'
+
+    # dt: pinball = 0.533177, mse = 86.064536
+    # pinball = 0.332122, mse = 25.215638
 
     # for consecutive several days
-    # start_date = '2020-04-14'
-    # predicted_length = 14
-    # date_list = generate_day_tag(start_date, predicted_length)
-    # for day in date_list:
-    #     scores = score_all_predictions(pred_file, '2020-04-28', '2020-04-27', key='deaths')
-    #     scores_mse = score_all_predictions(pred_file, '2020-04-28', '2020-04-27', key='deaths', mse=True)
-    #     print("Day %s: pinball=%f mse=%f" % (day, scores[0], scores_mse[0]))
+    start_date = '2020-04-28'
+    predicted_length = 3
+    date_list = generate_day_tag(start_date, predicted_length)
+    for day in date_list:
+        scores = score_all_predictions(pred_file, day, '2020-04-27', key='deaths')
+        scores_mse = score_all_predictions(pred_file, day, '2020-04-27', key='deaths', mse=True)
+        print("Day %s: pinball=%f mse=%f" % (day, scores[0], scores_mse[0]))
 
     # for single day
-    scores = score_all_predictions(pred_file, '2020-04-28', '2020-04-27', key='deaths')
-    scores_mse = score_all_predictions(pred_file, '2020-04-28', '2020-04-27', key='deaths', mse=True)
-    print("pinball=%f mse=%f" % (scores[0], scores_mse[0]))
+    # scores = score_all_predictions(pred_file, '2020-04-28', '2020-04-27', key='deaths')
+    # scores_mse = score_all_predictions(pred_file, '2020-04-28', '2020-04-27', key='deaths', mse=True)
+    # print("pinball=%f mse=%f" % (scores[0], scores_mse[0]))
