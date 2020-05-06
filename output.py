@@ -78,7 +78,7 @@ class Output(object):
             self.sample[percentile_keys[col]] = pre[:, col]
 
     @staticmethod
-    def generate_percentile(mid, mode='Norm', std=1):
+    def generate_percentile(mid, mode='Norm', std=100):
         if mode == 'Norm':
             percentile = list(stats.norm.ppf(np.linspace(0.1, 0.9, 9)) * std + mid)
         else:
