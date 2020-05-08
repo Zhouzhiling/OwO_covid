@@ -61,18 +61,17 @@ class DecisionTree(object):
             }
         )
 
-        result.to_csv('models/DT/dt.csv', index=False)
-
-    def generate_output(self):
-        source = 'models/DT/dt.csv'
-        dst = 'submissions/dt.csv'
-        Output = output.Output()
-        Output.save_submission(source, dst)
-
+        result.to_csv('models/DT/dt_outbreak.csv', index=False)
+    #
+    # def generate_output(self):
+    #     source = 'models/DT/dt.csv'
+    #     dst = 'submissions/dt.csv'
+    #     Output = output.Output()
+    #     Output.save_submission(source, dst)
 
 
 if __name__ == '__main__':
     ti = DecisionTree()
     ti.train()
     ti.test()
-    ti.generate_output()
+    # ti.generate_output()
