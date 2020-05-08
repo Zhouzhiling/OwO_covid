@@ -157,9 +157,9 @@ preprocessForNN.py + DNN.py
 
 ✅pinball loss
 
-❌add more feature to train DNN
+✅add more feature to train DNN
 
-❌特征工程（归一化ect）
+✅特征工程（归一化ect）
 
 ❌smooth the input by rolling mean
 
