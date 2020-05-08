@@ -65,7 +65,7 @@ def generate_day_tag(start_date, predicted_length):
 
 
 if __name__ == '__main__':
-    pred_file = '../submissions/svm.csv'
+    pred_file = '../submissions/submission_svm.csv'
 
     # dt: pinball = 0.533177, mse = 86.064536
     # pinball = 0.332122, mse = 25.215638

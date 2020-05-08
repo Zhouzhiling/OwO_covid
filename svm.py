@@ -12,7 +12,7 @@ class SVM(object):
 
     def train(self):
 
-        feature, label = self.preprocess.generate_training_data()
+        feature, label = self.preprocess.generate_training_data('burning')
 
         for i in range(14):
             clf = svm.SVR()
@@ -26,7 +26,7 @@ class SVM(object):
 
     def test(self):
 
-        feature, FIPS = self.preprocess.generate_testing_data()
+        feature, FIPS = self.preprocess.generate_testing_data('burning')
 
         predictions = []
 
@@ -63,7 +63,7 @@ class SVM(object):
             }
         )
 
-        result.to_csv('models/SVM/svm.csv', index=False)
+        result.to_csv('models/SVM/svm_burning.csv', index=False)
 
 
 if __name__ == '__main__':

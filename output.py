@@ -59,28 +59,28 @@ class Output(object):
             percentiles = self.generate_percentile(key_value[key])
             pre[i][:] = percentiles
 
-        # # ground truth part
-        ground_truth = pd.read_csv('data/us/covid/deaths.csv')
-        for i in range(len(self.sample)):
-            date, FIPS = self.format_key(self.sample['id'][i])
-            if date not in ground_truth or int(FIPS) not in ground_truth['countyFIPS']:
-                continue
-            if len(ground_truth.loc[ground_truth['countyFIPS'] == int(FIPS)][date].values) == 0:
-                continue
-            average = ground_truth.loc[ground_truth['countyFIPS'] == int(FIPS)][date].values[0]
-            percentiles = self.generate_percentile(average)
-            pre[i][:] = percentiles
-            # for j in range(9):
-            #     self.sample.iloc[i, j + 1] = percentile[j]
+        # # # ground truth part
+        # ground_truth = pd.read_csv('data/us/covid/deaths.csv')
+        # for i in range(len(self.sample)):
+        #     date, FIPS = self.format_key(self.sample['id'][i])
+        #     if date not in ground_truth or int(FIPS) not in ground_truth['countyFIPS']:
+        #         continue
+        #     if len(ground_truth.loc[ground_truth['countyFIPS'] == int(FIPS)][date].values) == 0:
+        #         continue
+        #     average = ground_truth.loc[ground_truth['countyFIPS'] == int(FIPS)][date].values[0]
+        #     percentiles = self.generate_percentile(average)
+        #     pre[i][:] = percentiles
+        #     # for j in range(9):
+        #     #     self.sample.iloc[i, j + 1] = percentile[j]
 
         percentile_keys = ['10', '20', '30', '40', '50', '60', '70', '80', '90']
         for col in range(9):
             self.sample[percentile_keys[col]] = pre[:, col]
 
     @staticmethod
-    def generate_percentile(mid, mode='Norm', std=100):
+    def generate_percentile(mid, mode='Norm', std=1):
         if mode == 'Norm':
-            percentile = list(stats.norm.ppf(np.linspace(0.1, 0.9, 9)) * std + mid)
+            percentile = list(np.round(stats.norm.ppf(np.linspace(0.1, 0.9, 9)) * std + mid))
         else:
             percentile = []
             unit = mid / 5.0
@@ -112,7 +112,7 @@ class Output(object):
 
 if __name__ == '__main__':
     # source = 'processed_data/SEIRS_predictions.csv'
-    source = 'models/SVM/svm.csv'
-    dst = 'models/DT/dt.csv'
+    source = 'models/SVM/svm_outbreak.csv'
+    dst = 'submissions/submission_svm.csv'
     output = Output()
     output.save_submission(source, dst)
