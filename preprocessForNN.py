@@ -241,13 +241,15 @@ class PreprocessForNN(object):
                 burning_FIPS.append(FIPS_list[i])
 
         if mode == 'outbreak':
+            outbreak_base = [outbreak_feature[i][13] for i in range(len(outbreak_feature))]
             scalered_feature = np.array(outbreak_feature)
             scalered_feature = self.scaler_feature.fit_transform(scalered_feature)
-            return scalered_feature, pd.Series(outbreak_FIPS)
+            return scalered_feature, pd.Series(outbreak_FIPS), outbreak_base
         else:
+            burning_base = [outbreak_feature[i][13] for i in range(len(burning_feature))]
             scalered_feature = np.array(burning_feature)
             scalered_feature = self.scaler_feature.fit_transform(scalered_feature)
-            return scalered_feature, pd.Series(burning_FIPS)
+            return scalered_feature, pd.Series(burning_FIPS), burning_base
 
     @staticmethod
     def transform_format(mode='death'):
