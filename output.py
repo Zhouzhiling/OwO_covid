@@ -8,7 +8,7 @@ class Output(object):
     def __init__(self, flag_calculate_diff=False):
         self.flag_calculate_diff = flag_calculate_diff
         self.sample = self.read_sample()
-        self.last_day = '5/10/2020'
+        self.last_day = '5/9/2020'
 
     @staticmethod
     def read_sample():
