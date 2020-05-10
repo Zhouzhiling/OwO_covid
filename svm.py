@@ -12,8 +12,8 @@ class SVM(object):
 
     def train(self):
 
-        feature, label = self.preprocess.generate_training_data()
-
+        feature, label = self.preprocess.generate_training_data(mode='burning')
+        print("Finish data process!")
         for i in range(14):
             clf = svm.SVR(C=2.0)
             clf.fit(feature, label[:, i])
@@ -26,7 +26,7 @@ class SVM(object):
 
     def test(self):
 
-        feature, FIPS, base = self.preprocess.generate_testing_data()
+        feature, FIPS, base = self.preprocess.generate_testing_data(mode='burning')
 
         predictions = []
 
@@ -68,7 +68,7 @@ class SVM(object):
             }
         )
 
-        result.to_csv('models/SVM/svm_outbreak.csv', index=False)
+        result.to_csv('models/SVM/svm_burning.csv', index=False)
 
 
 if __name__ == '__main__':

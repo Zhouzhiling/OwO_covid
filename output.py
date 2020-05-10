@@ -8,11 +8,12 @@ class Output(object):
     def __init__(self, flag_calculate_diff=False):
         self.flag_calculate_diff = flag_calculate_diff
         self.sample = self.read_sample()
-        self.last_day = '4/27/2020'
+        self.last_day = '5/10/2020'
 
     @staticmethod
     def read_sample():
-        return pd.read_csv('sample_submission.csv')
+        return pd.read_csv('submissions/svm_burning.csv')
+        # return pd.read_csv('sample_submission.csv')
 
     @staticmethod
     def generate_key(cur_date, FIPS):
@@ -48,7 +49,9 @@ class Output(object):
                 value = average
                 key_value[key] = value
 
-        pre = np.zeros((len(self.sample), 9))
+        # pre = np.zeros((len(self.sample), 9))
+        pre = self.sample.values[:, 1:]
+
         for i in range(len(self.sample)):
             if i % 1000 == 0:
                 print("%d/%d" % (i, len(self.sample)))
@@ -81,6 +84,7 @@ class Output(object):
     def generate_percentile(mid, mode='Norm', std=1):
         if mode == 'Norm':
             percentile = list(np.round(stats.norm.ppf(np.linspace(0.1, 0.9, 9)) * std + mid))
+            percentile = [max(0, val) for val in percentile]
         else:
             percentile = []
             unit = mid / 5.0
@@ -112,6 +116,7 @@ class Output(object):
 
 if __name__ == '__main__':
     # source = 'processed_data/SEIRS_predictions.csv'
+    # source = 'models/SVM/svm_outbreak.csv'
     source = 'models/SVM/svm_outbreak.csv'
     dst = 'submissions/submission_svm.csv'
     output = Output()

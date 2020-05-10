@@ -246,7 +246,7 @@ class PreprocessForNN(object):
             scalered_feature = self.scaler_feature.fit_transform(scalered_feature)
             return scalered_feature, pd.Series(outbreak_FIPS), outbreak_base
         else:
-            burning_base = [outbreak_feature[i][13] for i in range(len(burning_feature))]
+            burning_base = [burning_feature[i][13] for i in range(len(burning_feature))]
             scalered_feature = np.array(burning_feature)
             scalered_feature = self.scaler_feature.fit_transform(scalered_feature)
             return scalered_feature, pd.Series(burning_FIPS), burning_base
@@ -289,8 +289,8 @@ class PreprocessForNN(object):
                 value = infos[4]
 
             date_index = (date - first_day).days
-            if date_index >= 0 and FIPS in fips_idx:
-                fips_index = fips_idx[FIPS]
+            if date_index >= 0 and str(FIPS) in fips_idx:
+                fips_index = fips_idx[str(FIPS)]
                 pre[fips_index][date_index] = value
 
         for day_diff in range(len(template.columns)-4):
@@ -309,9 +309,9 @@ class PreprocessForNN(object):
 
 if __name__ == "__main__":
     preprocess = PreprocessForNN()
-    # preprocess.transform_format('death')
-    # preprocess.transform_format('confirmed')
+    preprocess.transform_format('death')
+    preprocess.transform_format('confirmed')
 
-    preprocess.load_data()
+    # preprocess.load_data()
     # preprocess.generate_training_data()
-    preprocess.generate_testing_data()
+    # preprocess.generate_testing_data()
