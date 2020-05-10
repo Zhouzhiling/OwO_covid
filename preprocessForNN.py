@@ -289,8 +289,8 @@ class PreprocessForNN(object):
                 value = infos[4]
 
             date_index = (date - first_day).days
-            if date_index >= 0 and str(FIPS) in fips_idx:
-                fips_index = fips_idx[str(FIPS)]
+            if date_index >= 0 and FIPS in fips_idx:
+                fips_index = fips_idx[FIPS]
                 pre[fips_index][date_index] = value
 
         for day_diff in range(len(template.columns)-4):
