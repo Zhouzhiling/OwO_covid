@@ -1,2 +1,12 @@
 *.DS_Store
 *.ipynb_checkpoints/
+.idea
+*.pyc
+*.vscode
+<<<<<<< HEAD
+
+=======
+.idea/
+*.pyc
+benchmark_models/*.csv
+>>>>>>> upstream/master

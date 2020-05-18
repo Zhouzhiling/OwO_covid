@@ -1,0 +1,10 @@
+scikit-learn
+keras
+statsmodels
+numpy
+dtw
+beautifulsoup4
+us
+gitpython
+pymupdf
+pandas >= 1.0.3

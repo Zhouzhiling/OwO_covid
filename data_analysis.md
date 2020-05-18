@@ -31,6 +31,22 @@ git push origin master
 
 
 
+### deaths.csv_4.2
+
+是累加数据还是当日数据？
+
+> max = 499
+>
+> 截止4.2，无死亡人数的county数目是2563，county总数是3195
+>
+> 已出现死亡的county大多符合指数分布
+
+<img src="./img/cumulative death.png" alt="image-20200403141242425" style="zoom:50%;" />
+
+
+
+
+
 ### ./data/us/demographics
 
 一些州的面积，人口，贫穷程度，失业率
@@ -59,6 +75,8 @@ county之间的地理位置信息，county的中心点等。
 
 医院数目，床位数量，icu床位数
 
+Beds per mile is the number of hospital beds per 1000 people in a county.
+
 
 
 ### ./data/us/mobility
@@ -84,3 +102,4 @@ FIPS和county名称的对应关系
 
 
 ### ./data/us/respiratory_disease
+
