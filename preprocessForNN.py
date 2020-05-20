@@ -312,6 +312,12 @@ if __name__ == "__main__":
     preprocess.transform_format('death')
     preprocess.transform_format('confirmed')
 
+    # how to run
+    import PreprocessForNN
+    preprocess = PreprocessForNN()
+    feature, label = preprocess.generate_training_data(mode='outbreak'/'burning')
+    feature, FIPS = preprocess.generate_testing_data(mode='outbreak'/'burning')
+
     # preprocess.load_data()
     # preprocess.generate_training_data()
     # preprocess.generate_testing_data()
