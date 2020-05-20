@@ -131,7 +131,7 @@ class PreprocessForNN(object):
         # self.fetch_none_zero_data()
         output = None
         for FIPS in self.valid_FIPS:
-            if FIPS == 0:
+            if FIPS == '0':
                 continue
             death_list = list(self.deathData.loc[self.deathData['countyFIPS'] == FIPS].values[0][4:])
             confirmed_list = list(self.confirmedData.loc[self.confirmedData['countyFIPS'] == FIPS].values[0][4:])
@@ -295,7 +295,7 @@ class PreprocessForNN(object):
 
         for day_diff in range(len(template.columns)-4):
             day_to_add = datetime.timedelta(days=day_diff)
-            label_name = (day_to_add + first_day).strftime('%#m/%#d/%Y')
+            label_name = (first_day + day_to_add).strftime('%#m/%#d/%Y')
             template[label_name] = pre[:, day_diff]
 
         template.to_csv(out_path, index=False)
@@ -311,6 +311,8 @@ if __name__ == "__main__":
     preprocess = PreprocessForNN()
     preprocess.transform_format('death')
     preprocess.transform_format('confirmed')
+
+    # preprocess.generate_testing_data()
 
     # preprocess.load_data()
     # preprocess.generate_training_data()
