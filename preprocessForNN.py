@@ -181,13 +181,13 @@ class PreprocessForNN(object):
             feature.append(point)
             label.append(item[1][death_key])
 
-        threshold = 100
+        threshold = 50
 
         outbreak_feature, outbreak_label = [], []
         burning_feature, burning_label = [], []
 
         for i in range(len(feature)):
-            if np.max(label[i]) > threshold:
+            if np.mean(label[i]) > threshold:
                 outbreak_feature.append(feature[i])
                 outbreak_label.append(label[i])
             else:
@@ -227,13 +227,13 @@ class PreprocessForNN(object):
             feature.append(point)
             FIPS_list.append(FIPS)
 
-        threshold = 10
+        threshold = 50
 
         outbreak_feature, outbreak_FIPS = [], []
         burning_feature, burning_FIPS = [], []
 
         for i in range(len(feature)):
-            if np.max(feature[i][13]) > threshold:
+            if np.mean(feature[i][7:14]) > threshold:
                 outbreak_feature.append(feature[i])
                 outbreak_FIPS.append(FIPS_list[i])
             else:
