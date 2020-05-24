@@ -8,11 +8,11 @@ class Output(object):
     def __init__(self, flag_calculate_diff=False):
         self.flag_calculate_diff = flag_calculate_diff
         self.sample = self.read_sample()
-        self.last_day = '5/9/2020'
+        self.last_day = '5/11/2020'
 
     @staticmethod
     def read_sample():
-        return pd.read_csv('submissions/svm_burning.csv')
+        return pd.read_csv('submissions/submission_lr.csv')
         # return pd.read_csv('sample_submission.csv')
 
     @staticmethod
@@ -20,11 +20,11 @@ class Output(object):
         # e.g. 2020-04-01-10001
         return cur_date.strftime('%Y-%m-%d') + '-' + str(int(FIPS))
 
-    def calculate_diff(self, predicted):
+    @staticmethod
+    def calculate_diff(predicted):
         FIPS = predicted['countyFIPS']
         diff_value = predicted.iloc[:,1:].diff(axis=1)
         return pd.concat([FIPS, diff_value.iloc[:, 1:]], axis=1)
-
 
     def modify_submission(self, source):
         # predicted part
@@ -81,7 +81,7 @@ class Output(object):
             self.sample[percentile_keys[col]] = pre[:, col]
 
     @staticmethod
-    def generate_percentile(mid, mode='Norm', std=1):
+    def generate_percentile(mid, mode='Norm', std=1.0):
         if mode == 'Norm':
             percentile = list(np.round(stats.norm.ppf(np.linspace(0.1, 0.9, 9)) * std + mid))
             percentile = [max(0, val) for val in percentile]
@@ -91,7 +91,6 @@ class Output(object):
             for i in range(9):
                 percentile.append(unit * (i+1))
         return percentile
-
 
     @staticmethod
     def format_key(key):
@@ -116,8 +115,8 @@ class Output(object):
 
 if __name__ == '__main__':
     # source = 'processed_data/SEIRS_predictions.csv'
-    # source = 'models/SVM/svm_outbreak.csv'
-    source = 'models/SVM/svm_outbreak.csv'
-    dst = 'submissions/submission_svm.csv'
+    source = 'models/SVM/svm_mid_2.csv'
+    # source = 'models/LR/lr_mid_2.csv'
+    dst = 'submissions/submission_lr.csv'
     output = Output()
     output.save_submission(source, dst)

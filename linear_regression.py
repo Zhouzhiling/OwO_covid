@@ -1,10 +1,10 @@
-from sklearn import svm
+from sklearn.linear_model import LinearRegression
 from preprocessForNN import PreprocessForNN
 import pandas as pd
 import numpy as np
 
 
-class SVM(object):
+class LinearRegressor(object):
 
     def __init__(self):
         self.clfs = []
@@ -12,10 +12,10 @@ class SVM(object):
 
     def train(self):
 
-        feature, label = self.preprocess.generate_training_data(mode='mid')
+        feature, label = self.preprocess.generate_training_data(mode='outbreak')
         print("Finish data process!")
         for i in range(14):
-            clf = svm.SVR()
+            clf = LinearRegression()
             clf.fit(feature[:, :14], label[:, i])
 
             acc = round(clf.score(feature[:, :14], label[:, i]) * 100, 2)
@@ -26,7 +26,7 @@ class SVM(object):
 
     def test(self):
 
-        feature, FIPS, base = self.preprocess.generate_testing_data(mode='mid')
+        feature, FIPS, base = self.preprocess.generate_testing_data(mode='outbreak')
 
         predictions = []
 
@@ -37,10 +37,8 @@ class SVM(object):
             pre = self.clfs[i].predict(feature[:, :14])
             pre = np.round(pre * std[i] + average[i])
 
-            ratio = [0.8, 0.7, 0.6, 0.5, 0.4, 0.5, 0.6]
-
-            for j in range(len(pre)):
-                pre[j] = min(pre[j], round(base[j] * ratio[i % 7]))
+            # for j in range(len(pre)):
+            #     pre[j] = min(pre[j], round(base[j] * (1.5 - ((i + 5) % 7) / 7)))
 
             predictions.append(pre)
 
@@ -70,10 +68,10 @@ class SVM(object):
             }
         )
 
-        result.to_csv('models/SVM/svm_mid_2.csv', index=False)
+        result.to_csv('models/LR/lr_outbreak.csv', index=False)
 
 
 if __name__ == '__main__':
-    s = SVM()
-    s.train()
-    s.test()
+    lr = LinearRegressor()
+    lr.train()
+    lr.test()

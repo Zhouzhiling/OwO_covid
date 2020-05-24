@@ -1,5 +1,5 @@
 from statsmodels.tsa.stattools import adfuller
-import regression_model
+import auto_regression_model
 import numpy as np
 import pandas as pd
 import math
