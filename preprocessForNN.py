@@ -133,8 +133,8 @@ class PreprocessForNN(object):
         self.confirmedData = pd.read_csv(confirmed_path)
 
         # get part of data
-        self.deathData = self.deathData.iloc[:, :-7]
-        self.confirmedData = self.confirmedData.iloc[:, :-7]
+        # self.deathData = self.deathData.iloc[:, :-7]
+        # self.confirmedData = self.confirmedData.iloc[:, :-7]
 
         self.valid_FIPS = set(self.deathData['countyFIPS'])
         # self.fetch_none_zero_data()

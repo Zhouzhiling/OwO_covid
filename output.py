@@ -8,11 +8,11 @@ class Output(object):
     def __init__(self, flag_calculate_diff=False):
         self.flag_calculate_diff = flag_calculate_diff
         self.sample = self.read_sample()
-        self.last_day = '5/11/2020'
+        self.last_day = '5/16/2020'
 
     @staticmethod
     def read_sample():
-        return pd.read_csv('submissions/submission_lr.csv')
+        return pd.read_csv('submissions/submission_final.csv')
         # return pd.read_csv('sample_submission.csv')
 
     @staticmethod
@@ -115,8 +115,8 @@ class Output(object):
 
 if __name__ == '__main__':
     # source = 'processed_data/SEIRS_predictions.csv'
-    source = 'models/SVM/svm_mid_2.csv'
-    # source = 'models/LR/lr_mid_2.csv'
-    dst = 'submissions/submission_lr.csv'
+    # source = 'models/SVM/svm_mid_2.csv'
+    source = 'models/LR/lr_burning.csv'
+    dst = 'submissions/submission_final.csv'
     output = Output()
     output.save_submission(source, dst)

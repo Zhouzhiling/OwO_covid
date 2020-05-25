@@ -12,7 +12,7 @@ class LinearRegressor(object):
 
     def train(self):
 
-        feature, label = self.preprocess.generate_training_data(mode='outbreak')
+        feature, label = self.preprocess.generate_training_data(mode='mid')
         print("Finish data process!")
         for i in range(14):
             clf = LinearRegression()
@@ -26,7 +26,7 @@ class LinearRegressor(object):
 
     def test(self):
 
-        feature, FIPS, base = self.preprocess.generate_testing_data(mode='outbreak')
+        feature, FIPS, base = self.preprocess.generate_testing_data(mode='mid')
 
         predictions = []
 
@@ -68,7 +68,7 @@ class LinearRegressor(object):
             }
         )
 
-        result.to_csv('models/LR/lr_outbreak.csv', index=False)
+        result.to_csv('models/LR/lr_mid.csv', index=False)
 
 
 if __name__ == '__main__':

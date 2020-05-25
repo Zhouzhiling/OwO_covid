@@ -12,7 +12,7 @@ class SVM(object):
 
     def train(self):
 
-        feature, label = self.preprocess.generate_training_data(mode='mid')
+        feature, label = self.preprocess.generate_training_data(mode='outbreak')
         print("Finish data process!")
         for i in range(14):
             clf = svm.SVR()
@@ -26,7 +26,7 @@ class SVM(object):
 
     def test(self):
 
-        feature, FIPS, base = self.preprocess.generate_testing_data(mode='mid')
+        feature, FIPS, base = self.preprocess.generate_testing_data(mode='outbreak')
 
         predictions = []
 
@@ -70,7 +70,7 @@ class SVM(object):
             }
         )
 
-        result.to_csv('models/SVM/svm_mid_2.csv', index=False)
+        result.to_csv('models/SVM/svm_outbreak.csv', index=False)
 
 
 if __name__ == '__main__':
