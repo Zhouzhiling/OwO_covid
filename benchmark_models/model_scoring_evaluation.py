@@ -72,12 +72,12 @@ if __name__ == '__main__':
     # pinball = 0.332122, mse = 25.215638
 
     # for consecutive several days
-    start_date = '2020-05-17'
+    start_date = '2020-05-18'
     predicted_length = 7
     date_list = generate_day_tag(start_date, predicted_length)
     for day in date_list:
-        scores = score_all_predictions(pred_file, day, '2020-05-16', key='deaths')
-        scores_mse = score_all_predictions(pred_file, day, '2020-05-16', key='deaths', mse=True)
+        scores = score_all_predictions(pred_file, day, '2020-05-17', key='deaths')
+        scores_mse = score_all_predictions(pred_file, day, '2020-05-17', key='deaths', mse=True)
         print("Day %s: pinball=%f mse=%f" % (day, scores[0], scores_mse[0]))
 
     # for single day

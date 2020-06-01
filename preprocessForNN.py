@@ -39,7 +39,8 @@ class PreprocessForNN(object):
         self.scaler_label = StandardScaler()
         self.valid_FIPS = set()
         self.upper = 50.0
-        self.lower = 10.0
+        self.mid = 10.0
+        self.lower = 1.0
 
     def load_policies(self):
         '''
@@ -190,13 +191,17 @@ class PreprocessForNN(object):
             label.append(item[1][death_key])
 
         outbreak_feature, outbreak_label = [], []
-        mid_feature, mid_label = [], []
+        mid_feature, mid2_label = [], []
+        mid2_feature, mid_label = [], []
         burning_feature, burning_label = [], []
 
         for i in range(len(feature)):
             if self.upper <= np.mean(label[i]):
                 outbreak_feature.append(feature[i])
                 outbreak_label.append(label[i])
+            elif self.mid <= np.mean(label[i]):
+                mid2_feature.append(feature[i])
+                mid2_label.append(label[i])
             elif self.lower <= np.mean(label[i]):
                 mid_feature.append(feature[i])
                 mid_label.append(label[i])
@@ -207,6 +212,12 @@ class PreprocessForNN(object):
         if mode == 'outbreak':
             scalered_feature = np.array(outbreak_feature)
             scalered_label = np.array(outbreak_label)
+            scalered_feature = self.scaler_feature.fit_transform(scalered_feature)
+            scalered_label = self.scaler_label.fit_transform(scalered_label)
+            return scalered_feature, scalered_label
+        elif mode == 'mid2':
+            scalered_feature = np.array(mid2_feature)
+            scalered_label = np.array(mid2_label)
             scalered_feature = self.scaler_feature.fit_transform(scalered_feature)
             scalered_label = self.scaler_label.fit_transform(scalered_label)
             return scalered_feature, scalered_label
@@ -245,12 +256,16 @@ class PreprocessForNN(object):
 
         outbreak_feature, outbreak_FIPS = [], []
         mid_feature, mid_FIPS = [], []
+        mid2_feature, mid2_FIPS = [], []
         burning_feature, burning_FIPS = [], []
 
         for i in range(len(feature)):
             if self.upper <= np.mean(feature[i][7:14]):
                 outbreak_feature.append(feature[i])
                 outbreak_FIPS.append(FIPS_list[i])
+            elif self.mid <= np.mean(feature[i][7:14]):
+                mid2_feature.append(feature[i])
+                mid2_FIPS.append(FIPS_list[i])
             elif self.lower <= np.mean(feature[i][7:14]):
                 mid_feature.append(feature[i])
                 mid_FIPS.append(FIPS_list[i])
@@ -263,6 +278,11 @@ class PreprocessForNN(object):
             scalered_feature = np.array(outbreak_feature)
             scalered_feature = self.scaler_feature.fit_transform(scalered_feature)
             return scalered_feature, pd.Series(outbreak_FIPS), outbreak_base
+        elif mode == 'mid2':
+            mid2_base = [np.mean(mid2_feature[i][7:14]) for i in range(len(mid2_feature))]
+            scalered_feature = np.array(mid2_feature)
+            scalered_feature = self.scaler_feature.fit_transform(scalered_feature)
+            return scalered_feature, pd.Series(mid2_FIPS), mid2_base
         elif mode == 'mid':
             mid_base = [np.mean(mid_feature[i][7:14]) for i in range(len(mid_feature))]
             scalered_feature = np.array(mid_feature)

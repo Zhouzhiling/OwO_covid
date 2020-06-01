@@ -10,23 +10,22 @@ class LinearRegressor(object):
         self.clfs = []
         self.preprocess = PreprocessForNN()
 
-    def train(self):
+    def train(self, mode='burning'):
 
-        feature, label = self.preprocess.generate_training_data(mode='mid')
-        print("Finish data process!")
+        feature, label = self.preprocess.generate_training_data(mode)
         for i in range(14):
             clf = LinearRegression()
             clf.fit(feature[:, :14], label[:, i])
 
             acc = round(clf.score(feature[:, :14], label[:, i]) * 100, 2)
 
-            print('Date: %d. Training acc: %f' % (i, acc))
+            print('Day: %d. Training acc: %f' % (i, acc))
 
             self.clfs.append(clf)
 
-    def test(self):
+    def test(self, mode='burning'):
 
-        feature, FIPS, base = self.preprocess.generate_testing_data(mode='mid')
+        feature, FIPS, base = self.preprocess.generate_testing_data(mode)
 
         predictions = []
 
@@ -68,7 +67,9 @@ class LinearRegressor(object):
             }
         )
 
-        result.to_csv('models/LR/lr_mid.csv', index=False)
+        path = 'models/LR/lr_' + mode + '.csv'
+        result.to_csv(path, index=False)
+        print('Predictions saved as ' + path)
 
 
 if __name__ == '__main__':

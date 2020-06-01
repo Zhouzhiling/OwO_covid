@@ -10,10 +10,9 @@ class SVM(object):
         self.clfs = []
         self.preprocess = PreprocessForNN()
 
-    def train(self):
+    def train(self, mode='outbreak'):
 
-        feature, label = self.preprocess.generate_training_data(mode='outbreak')
-        print("Finish data process!")
+        feature, label = self.preprocess.generate_training_data(mode)
         for i in range(14):
             clf = svm.SVR()
             clf.fit(feature[:, :14], label[:, i])
@@ -24,9 +23,9 @@ class SVM(object):
 
             self.clfs.append(clf)
 
-    def test(self):
+    def test(self, mode='outbreak'):
 
-        feature, FIPS, base = self.preprocess.generate_testing_data(mode='outbreak')
+        feature, FIPS, base = self.preprocess.generate_testing_data(mode)
 
         predictions = []
 
@@ -37,7 +36,8 @@ class SVM(object):
             pre = self.clfs[i].predict(feature[:, :14])
             pre = np.round(pre * std[i] + average[i])
 
-            ratio = [0.8, 0.7, 0.6, 0.5, 0.4, 0.5, 0.6]
+            original_ratio = [0.5, 0.6, 0.7, 0.8, 0.7, 0.6, 0.5]
+            ratio = [item * (1.0 - (i / 7) * 0.1) for item in original_ratio]
 
             for j in range(len(pre)):
                 pre[j] = min(pre[j], round(base[j] * ratio[i % 7]))
@@ -70,7 +70,9 @@ class SVM(object):
             }
         )
 
-        result.to_csv('models/SVM/svm_outbreak.csv', index=False)
+        path = 'models/SVM/svm_' + mode + '.csv'
+        result.to_csv(path, index=False)
+        print('Predictions saved as ' + path)
 
 
 if __name__ == '__main__':
