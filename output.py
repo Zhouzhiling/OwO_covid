@@ -5,15 +5,15 @@ from scipy import stats
 
 
 class Output(object):
-    def __init__(self, flag_calculate_diff=False):
-        self.flag_calculate_diff = flag_calculate_diff
-        self.sample = self.read_sample()
-        self.last_day = '5/17/2020'
 
-    @staticmethod
-    def read_sample():
-        return pd.read_csv('submissions/submission_final_checkpoint.csv')
-        # return pd.read_csv('sample_submission.csv')
+    def __init__(self, flag_calculate_diff=False, submission='sample_submission.csv'):
+        self.flag_calculate_diff = flag_calculate_diff
+        self.last_day = '5/17/2020'
+        self.submission = submission
+        self.sample = self.read_sample()
+
+    def read_sample(self):
+        return pd.read_csv(self.submission)
 
     @staticmethod
     def generate_key(cur_date, FIPS):
@@ -53,7 +53,7 @@ class Output(object):
         pre = self.sample.values[:, 1:]
 
         for i in range(len(self.sample)):
-            if i % 10000 == 0:
+            if i % 100000 == 0:
                 print("%d/%d" % (i, len(self.sample)))
 
             key = self.sample['id'][i]

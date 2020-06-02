@@ -3,7 +3,6 @@ from keras.layers import Dense, Input
 from keras.optimizers import Adam
 from keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint
 from keras.models import load_model
-from keras.initializers import random_normal
 from preprocessForNN import PreprocessForNN
 import pandas as pd
 import numpy as np
@@ -11,9 +10,9 @@ import numpy as np
 
 class DNN(object):
 
-    def __init__(self):
+    def __init__(self, mode='outbreak'):
         self.preprocess = PreprocessForNN()
-        self.mode = 'outbreak'
+        self.mode = mode
 
     def train(self):
 
@@ -36,24 +35,6 @@ class DNN(object):
             activation='relu'
         )(d)
 
-        # d = Dense(
-        #     units=512,
-        #     activation='relu',
-        #     kernel_initializer=random_normal(stddev=0.01)
-        # )(d)
-        #
-        # d = Dense(
-        #     units=256,
-        #     activation='relu',
-        #     kernel_initializer=random_normal(stddev=0.01)
-        # )(d)
-        #
-        # d = Dense(
-        #     units=128,
-        #     activation='relu',
-        #     kernel_initializer=random_normal(stddev=0.01)
-        # )(d)
-        #
         d = Dense(
             units=64,
             activation='relu'
@@ -116,7 +97,6 @@ class DNN(object):
         model.save('models/DNN/dnn_model.hdf5')
 
     def predict(self):
-        # self.preprocess.generate_training_data(mode=self.mode)
         feature, FIPS, _ = self.preprocess.generate_testing_data(mode=self.mode)
 
         model = load_model('models/DNN/dnn_model.hdf5')
@@ -126,10 +106,30 @@ class DNN(object):
         prediction = pd.DataFrame(pre, index=None)
 
         result = pd.concat([FIPS, prediction], axis=1, ignore_index=True)
+        result = result.rename(
+            columns={
+                0: 'countyFIPS',
+                1: 0,
+                2: 1,
+                3: 2,
+                4: 3,
+                5: 4,
+                6: 5,
+                7: 6,
+                8: 7,
+                9: 8,
+                10: 9,
+                11: 10,
+                12: 11,
+                13: 12,
+                14: 13
+            }
+        )
 
-        result.to_csv('models/DNN/prediction.csv', index=False)
+        path = 'models/DNN/dnn_' + self.mode + '.csv'
+        result.to_csv(path, index=False)
 
-        return pre
+        print('Predictions saved as ' + path)
 
 
 if __name__ == '__main__':

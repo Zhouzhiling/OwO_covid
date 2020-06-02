@@ -191,8 +191,8 @@ class PreprocessForNN(object):
             label.append(item[1][death_key])
 
         outbreak_feature, outbreak_label = [], []
-        mid_feature, mid2_label = [], []
-        mid2_feature, mid_label = [], []
+        mid2_feature, mid2_label = [], []
+        mid_feature, mid_label = [], []
         burning_feature, burning_label = [], []
 
         for i in range(len(feature)):
